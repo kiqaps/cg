@@ -1,7 +1,9 @@
 #include <iostream>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
+#include <ctime>
+#include <cstdlib>
 #include "Ponto.h"
+#include "Poligono.h"
 
 using namespace std;
 
@@ -12,14 +14,13 @@ using namespace std;
 int init();
 void loop();
 void ProcessInput();
-void Redraw();
+void Draw();
 void Update();
 void quit();
 
 bool bRunning = true;
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRender = NULL;
-
 
 int main (int argc, char** argv)
 {
@@ -35,7 +36,6 @@ int main (int argc, char** argv)
     return 0;
 }
 
-
 void ProcessInput()
 {
     SDL_Event evt;
@@ -49,9 +49,17 @@ void ProcessInput()
     }
 }
 
-void Redraw()
+void Draw()
 {
+    int n = 3 + rand() % 1;
+     Poligono randP(n);
 
+     for (int i = 0; i < n; i++)
+         randP[i] = { 1 + rand() % (WINDOW_WIDTH - 1), 1 + rand() % (WINDOW_HEIGHT - 1) };
+
+    SDL_RenderClear(gRender);
+    randP.draw(gRender, 0x0, 0x0, 0xFF, 0xFF);
+    randP.fill(gRender, 0xFF, 0x0, 0x0, 0xFF);
 }
 
 void Update()
@@ -61,6 +69,7 @@ void Update()
 
 int init()
 {
+    srand(time(NULL));
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS) != 0)
         return -1;
 
@@ -71,7 +80,6 @@ int init()
     if (!gRender) return -1;
 
     SDL_RenderClear(gRender);
-
     return 0;
 }
 
@@ -83,10 +91,10 @@ void loop()
         sTicks = SDL_GetTicks();
 
         ProcessInput();
-        Redraw();
+        Draw();
         Update();
 
-        SDL_Delay(16 - (SDL_GetTicks() - sTicks));
+        SDL_Delay(500 - (SDL_GetTicks() - sTicks));
     }
 }
 
