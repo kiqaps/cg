@@ -51,7 +51,7 @@ void ProcessInput()
 
 void Draw()
 {
-    int n = 3 + rand() % 1;
+    int n = 3 + rand() % 2;
      Poligono randP(n);
 
      for (int i = 0; i < n; i++)

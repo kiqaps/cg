@@ -48,36 +48,29 @@ void Poligono::fill(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
     SDL_GetRenderDrawColor(renderer, &before[0], &before[1], &before[2], &before[3]);
     SDL_SetRenderDrawColor(renderer, r, g, b, a);
 
-    int Ymax = INT32_MIN, Ymin = INT32_MAX;
+    std::vector < std::vector <double> > tabela (this->linhas.size(), std::vector<double>(4, 0.0));
+    int Ymin = INT32_MAX, Ymax = INT32_MIN;
 
-    for (int i = 0; i < this->pontos.size(); i++)
+    for (int i = 0; i < this->linhas.size(); i++)
     {
-        Ymax = std::max(Ymax, this->pontos[i].y);
-        Ymin = std::min(Ymin, this->pontos[i].x);
+        Ponto p1 = this->linhas[i].first, p2 = this->linhas[i].second;
+        tabela[i][0] = std::min (p1.y, p2.y);
+        tabela[i][1] = std::max (p1.y, p2.y);
+        tabela[i][2] = p1.y == tabela[i][0] ? p1.x : p2.x;
+        tabela[i][3] = (p2.x - p1.x) / (float) (p2.y - p1.y);
+
+        Ymin = std::min (Ymin, (int) tabela[i][0]);
+        Ymax = std::max (Ymax, (int) tabela[i][1]);
     }
 
-    for (int Yatual = Ymin + 1; Yatual < Ymax; Yatual++)
+    for (Yvarredura = Ymin - 1; Yvarredura < Ymax; Yvarredura++)
     {
-        std::vector<Ponto> intersecoes;
-        
         for (int i = 0; i < this->linhas.size(); i++)
         {
-            int Xatual = ((Yatual - this->pontos[this->linhas[i].first].y) * (this->pontos[this->linhas[i].second].x - this->pontos[this->linhas[i].first].x)) / (this->pontos[this->linhas[i].second].y - this->pontos[this->linhas[i].first].y) + this->pontos[this->linhas[i].first].x;
-            if ((Xatual >= this->pontos[this->linhas[i].first].x && Xatual <= this->pontos[this->linhas[i].second].x) ||
-            (Xatual >= this->pontos[this->linhas[i].second].x && Xatual <= this->pontos[this->linhas[i].first].x))
+            if (Yvarredura <= tabela[i][1] && Yvarredura >= tabela[i][0])
             {
-                intersecoes.push_back(Ponto(Xatual, Yatual));
+                // TODO
             }
-        }
-
-        std::sort(intersecoes.begin(), intersecoes.end(), [](const Ponto& lhs, const Ponto& rhs)
-            {
-                return lhs.x <= rhs.y;
-            });
-
-        for (int i = 0; i < intersecoes.size(); i += 2)
-        {
-            linhaDDA(renderer, intersecoes[i], intersecoes[i+1]);
         }
     }
 
