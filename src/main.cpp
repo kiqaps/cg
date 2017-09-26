@@ -51,14 +51,14 @@ void ProcessInput()
 
 void Draw()
 {
-    int n = 3 + rand() % 2;
+    int n = 3 + rand() % 18;
      Poligono randP(n);
 
      for (int i = 0; i < n; i++)
          randP[i] = { 1 + rand() % (WINDOW_WIDTH - 1), 1 + rand() % (WINDOW_HEIGHT - 1) };
 
     SDL_RenderClear(gRender);
-    randP.draw(gRender, 0x0, 0x0, 0xFF, 0xFF);
+
     randP.fill(gRender, 0xFF, 0x0, 0x0, 0xFF);
 }
 

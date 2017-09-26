@@ -53,7 +53,7 @@ void Poligono::fill(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 
     for (int i = 0; i < this->linhas.size(); i++)
     {
-        Ponto p1 = this->linhas[i].first, p2 = this->linhas[i].second;
+        Ponto p1 = this->pontos[this->linhas[i].first], p2 = this->pontos[this->linhas[i].second];
         tabela[i][0] = std::min (p1.y, p2.y);
         tabela[i][1] = std::max (p1.y, p2.y);
         tabela[i][2] = p1.y == tabela[i][0] ? p1.x : p2.x;
@@ -63,13 +63,33 @@ void Poligono::fill(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
         Ymax = std::max (Ymax, (int) tabela[i][1]);
     }
 
-    for (Yvarredura = Ymin - 1; Yvarredura < Ymax; Yvarredura++)
+    for (int Yvarredura = Ymin; Yvarredura < Ymax; Yvarredura++)
     {
+        std::vector<int> intersecoes;
         for (int i = 0; i < this->linhas.size(); i++)
         {
-            if (Yvarredura <= tabela[i][1] && Yvarredura >= tabela[i][0])
+            if (this->pontos[this->linhas[i].first].y != this->pontos[this->linhas[i].second].y)
             {
-                // TODO
+                if (Yvarredura <= tabela[i][1] && Yvarredura >= tabela[i][0])
+                {
+                    float Xatual = tabela[i][3] * (Yvarredura - tabela[i][0]) + tabela[i][2];
+                    intersecoes.push_back((int) Xatual);
+                }
+            }
+        }
+
+        sort(intersecoes.begin(), intersecoes.end());
+
+        if (intersecoes.size() % 2)
+        {
+            for (int i = 0; i < intersecoes.size() - 1; i++)
+            {
+                linhaDDA(renderer, Ponto(intersecoes[i], Yvarredura) , Ponto(intersecoes[i+1], Yvarredura));
+            }
+        } else {
+            for (int i = 0; i < intersecoes.size(); i += 2)
+            {
+                linhaDDA(renderer, Ponto(intersecoes[i], Yvarredura) , Ponto(intersecoes[i+1], Yvarredura));
             }
         }
     }
