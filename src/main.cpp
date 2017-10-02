@@ -3,7 +3,7 @@
 #include <ctime>
 #include <cstdlib>
 #include "Ponto.h"
-#include "Poligono.h"
+#include "Objeto3D.h"
 
 using namespace std;
 
@@ -21,6 +21,7 @@ void quit();
 bool bRunning = true;
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRender = NULL;
+Objeto3D obj;
 
 int main (int argc, char** argv)
 {
@@ -29,6 +30,8 @@ int main (int argc, char** argv)
         cout << "Não foi possível inicializar o SDL: " << SDL_GetError() << endl;
         return 1;
     }
+
+    obj = Objeto3D::create(OBJ_QUADRADO);
 
     loop();
 
@@ -51,15 +54,7 @@ void ProcessInput()
 
 void Draw()
 {
-    int n = 3 + rand() % 18;
-     Poligono randP(n);
-
-     for (int i = 0; i < n; i++)
-         randP[i] = { 1 + rand() % (WINDOW_WIDTH - 1), 1 + rand() % (WINDOW_HEIGHT - 1) };
-
-    SDL_RenderClear(gRender);
-
-    randP.fill(gRender, 0xFF, 0x0, 0x0, 0xFF);
+    obj.draw(gRender, 0xFF, 0x0, 0x0);
 }
 
 void Update()

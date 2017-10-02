@@ -5,9 +5,11 @@
 
 class Ponto {
 public:
-    int x, y, z;
+    int x, y, z, m;
     Ponto(int x, int y);
     Ponto(int x, int y, int z);
+
+    int operator[] (int idx);
     friend std::ostream& operator<< (std::ostream& strm, const Ponto& p);
 
 private:
