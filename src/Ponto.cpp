@@ -17,7 +17,7 @@ Ponto::Ponto(int x, int y, int z)
     this->xyz = true;
 }
 
-int Ponto::operator[] (int idx)
+int& Ponto::operator[] (int idx)
 {
     if (idx == 0) return this->x;
     else if (idx == 1) return this->y;

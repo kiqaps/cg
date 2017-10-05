@@ -26,4 +26,18 @@ void linhaDDA (SDL_Renderer* render, Ponto pi, Ponto pf)
     }
 }
 
+std::vector<Ponto> Multiplica(std::vector<Ponto> pontos, std::vector< std::vector<int> > mat)
+{
+    std::vector<Ponto> ret (pontos.size(), Ponto(0,0,0));
+
+    for (int i = 0; i < pontos.size(); i++) {
+        for (int j = 0; j < 4; j++) {
+            for (int k = 0; k < 4; k++) {
+                ret[i][j] += pontos[i][k] * mat[k][j];
+            }
+        }
+    }
+    return ret;
+}
+
 #endif

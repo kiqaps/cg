@@ -2,14 +2,11 @@
 #include <SDL2/SDL.h>
 #include <ctime>
 #include <cstdlib>
+#include "config.h"
 #include "Ponto.h"
 #include "Objeto3D.h"
 
 using namespace std;
-
-#define WINDOW_TITLE            "Trabalho de CG"
-#define WINDOW_WIDTH            640
-#define WINDOW_HEIGHT           480
 
 int init();
 void loop();
@@ -55,6 +52,9 @@ void ProcessInput()
 void Draw()
 {
     obj.draw(gRender, 0xFF, 0x0, 0x0);
+
+    SDL_SetRenderDrawColor(gRender, 0x0, 0x0, 0x0, 0xFF);
+    SDL_RenderDrawPoint(gRender, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
 }
 
 void Update()
@@ -74,6 +74,7 @@ int init()
     gRender = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
     if (!gRender) return -1;
 
+    SDL_SetRenderDrawColor(gRender, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(gRender);
     return 0;
 }
@@ -89,7 +90,7 @@ void loop()
         Draw();
         Update();
 
-        SDL_Delay(500 - (SDL_GetTicks() - sTicks));
+        SDL_Delay(16 - (SDL_GetTicks() - sTicks));
     }
 }
 
