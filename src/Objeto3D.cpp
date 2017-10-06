@@ -56,7 +56,7 @@ void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
         real2.x = (int) (WINDOW_WIDTH * ((double) real2.x / (2.0 * OBJ_MAX_X)));
         real2.y = (int) (WINDOW_HEIGHT * ((double) real2.y / (2.0 * OBJ_MAX_Y)));
 
-        linhaDDA(renderer, real1, real2);
+        Utils::linhaDDA(renderer, real1, real2);
     }
 
     SDL_SetRenderDrawColor(renderer, before[0], before[1], before[2], before[3]);
@@ -69,12 +69,12 @@ void Objeto3D::resetTransformations()
 
 void Objeto3D::applyTranslocation()
 {
-    this->pontos_T = Multiplica(this->pontos_T, this->Translocation);
+    this->pontos_T = Utils::Multiplica(this->pontos_T, this->Translocation);
 }
 
 void Objeto3D::applyScale()
 {
-    this->pontos_T = Multiplica(this->pontos_T, this->Scale);
+    this->pontos_T = Utils::Multiplica(this->pontos_T, this->Scale);
 }
 
 int Objeto3D::getPontosCount()

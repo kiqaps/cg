@@ -1,10 +1,12 @@
 #include <iostream>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <ctime>
 #include <cstdlib>
 #include "config.h"
 #include "Ponto.h"
 #include "Objeto3D.h"
+#include "InfoPanel.h"
 
 using namespace std;
 
@@ -15,9 +17,29 @@ void Draw();
 void Update();
 void quit();
 
+void CreateText(SDL_Renderer* render, TTF_Font* font, const char* text, SDL_Color color, SDL_Texture** texture, SDL_Rect* rect);
+
+int gMode = 0;
 bool bRunning = true;
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRender = NULL;
+TTF_Font* gFont = NULL;
+InfoPanel* gInfoPanel = NULL;
+SDL_Rect modeText;
+SDL_Texture *modeTexture = NULL;
+
+char modes_names[][25] = {
+    "Translação em X",
+    "Translação em Y",
+    "Translação em Z",
+    "Escalar X",
+    "Escalar Y",
+    "Escalar Z",
+    "Rotação em torno de X",
+    "Rotação em torno de Y",
+    "Rotação em torno de Z"
+};
+
 Objeto3D obj;
 
 int main (int argc, char** argv)
@@ -29,6 +51,24 @@ int main (int argc, char** argv)
     }
 
     obj = Objeto3D::create(OBJ_QUADRADO);
+
+    gInfoPanel = new InfoPanel(gRender, gFont);
+    gInfoPanel->addInfo("MODO ATUAL:");
+    gInfoPanel->addInfo("Aperte q para translação em X");
+    gInfoPanel->addInfo("Aperte w para translação em Y");
+    gInfoPanel->addInfo("Aperte e para translação em Z");
+    gInfoPanel->addInfo("Aperte a para escalar X");
+    gInfoPanel->addInfo("Aperte s para escalar Y");
+    gInfoPanel->addInfo("Aperte d para escalar Z");
+    gInfoPanel->addInfo("Aperte z para rotacionar em torno de X");
+    gInfoPanel->addInfo("Aperte x para rotacionar em torno de Y");
+    gInfoPanel->addInfo("Aperte c para rotacionar em torno de Z");
+    gInfoPanel->addInfo(" ");
+    gInfoPanel->addInfo("Use as setas (cima e baixo) para");
+    gInfoPanel->addInfo("aplicar a transformação deseja");
+
+    modeText.y = 1;
+    modeText.x = gInfoPanel->texturesRect[0].w + FONT_SIZE; 
 
     loop();
 
@@ -46,15 +86,61 @@ void ProcessInput()
             bRunning = false;
             break;
         }
+        else if (evt.type == SDL_KEYDOWN)
+        {
+            if (evt.key.keysym.sym == SDLK_q)
+                gMode = 0;
+            else if (evt.key.keysym.sym == SDLK_w)
+                gMode = 1;
+            else if (evt.key.keysym.sym == SDLK_e)
+                gMode = 2;
+            else if (evt.key.keysym.sym == SDLK_a)
+                gMode = 3;
+            else if (evt.key.keysym.sym == SDLK_s)
+                gMode = 4;
+            else if (evt.key.keysym.sym == SDLK_d)
+                gMode = 5;
+            else if (evt.key.keysym.sym == SDLK_z)
+                gMode = 6;
+            else if (evt.key.keysym.sym == SDLK_x)
+                gMode = 7;
+            else if (evt.key.keysym.sym == SDLK_c)
+                gMode = 8;
+            else if (evt.key.keysym.sym == SDLK_UP || evt.key.keysym.sym == SDLK_DOWN)
+            {
+                int sinal = -1;
+
+                if (evt.key.keysym.sym == SDLK_UP)
+                    sinal = 1;
+
+                if (gMode == 0)
+                    obj.Translocation[3][0] += sinal * QTD_TRANSLACAO;
+                else if (gMode == 1)
+                    obj.Translocation[3][1] += sinal * QTD_TRANSLACAO;
+                else if (gMode == 2)
+                    obj.Translocation[3][2] += sinal * QTD_TRANSLACAO;
+
+                else if (gMode == 3)
+                    obj.Scale[0][0] += sinal * QTD_ESCALA;
+                else if (gMode == 4)
+                    obj.Scale[1][1] += sinal * QTD_ESCALA;
+                else if (gMode == 5)
+                    obj.Scale[2][2] += sinal * QTD_ESCALA;
+            }
+        }
     }
 }
 
 void Draw()
-{
-    obj.draw(gRender, 0xFF, 0x0, 0x0);
+{  
+    SDL_SetRenderDrawColor(gRender, 0xFF, 0xFF, 0xFF, 0xFF);
+    SDL_RenderClear(gRender);
 
-    SDL_SetRenderDrawColor(gRender, 0x0, 0x0, 0x0, 0xFF);
-    SDL_RenderDrawPoint(gRender, WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2);
+    obj.draw(gRender, 0xFF, 0x0, 0x0);
+    
+    Utils::CreateText(gRender, gFont, modes_names[gMode], {0x42, 0x44, 0xF8, 0xFF}, &modeTexture, &modeText);
+    SDL_RenderCopy(gRender, modeTexture, NULL, &modeText);
+    gInfoPanel->draw();
 }
 
 void Update()
@@ -74,8 +160,10 @@ int init()
     gRender = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
     if (!gRender) return -1;
 
-    SDL_SetRenderDrawColor(gRender, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderClear(gRender);
+    if (TTF_Init() != 0) return -1;
+
+    gFont = TTF_OpenFont("assets/fonts/Verdana.ttf", FONT_SIZE);
+    if (!gFont) return -1;
     return 0;
 }
 
@@ -90,13 +178,17 @@ void loop()
         Draw();
         Update();
 
-        SDL_Delay(16 - (SDL_GetTicks() - sTicks));
+        SDL_Delay(30 - (SDL_GetTicks() - sTicks));
     }
 }
 
 void quit()
 {
+    delete gInfoPanel;
+    SDL_DestroyTexture(modeTexture);
     SDL_DestroyRenderer(gRender);
     SDL_DestroyWindow(gWindow);
+    TTF_CloseFont(gFont);
+    TTF_Quit();
     SDL_Quit();
 }
