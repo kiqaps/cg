@@ -43,6 +43,7 @@ void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
 
     this->resetTransformations();
     this->applyScale();
+    this->applyRotation();
     this->applyTranslocation();
 
     for (int i = 0; i < this->linhas.size(); i++)
@@ -75,6 +76,33 @@ void Objeto3D::applyTranslocation()
 void Objeto3D::applyScale()
 {
     this->pontos_T = Utils::Multiplica(this->pontos_T, this->Scale);
+}
+
+void Objeto3D::applyRotation()
+{
+    std::vector< std::vector<double> > RotX = { 
+        {cos(rad(rx)), sin(rad(rx)), 0, 0},
+        {-sin(rad(rx)), cos(rad(rx)), 0, 0},
+        {0, 0, 1, 0},
+        {0, 0, 0, 1}
+    };
+    this->pontos_T = Utils::Multiplica(this->pontos_T, RotX);
+
+    std::vector< std::vector<double> > RotY = { 
+        {1, 0, 0, 0},
+        {0, cos(rad(ry)), sin(rad(ry)), 0},
+        {0, -sin(rad(ry)), cos(rad(ry)), 0},
+        {0, 0, 0, 1}
+    };
+    this->pontos_T = Utils::Multiplica(this->pontos_T, RotY);
+
+    std::vector< std::vector<double> > RotZ = { 
+        {cos(rad(rz)), 0, -sin(rad(rz)), 0},
+        {0, 1, 0, 0},
+        {sin(rad(rz)), 0, cos(rad(rz)), 0},
+        {0, 0, 0, 1}
+    };
+    this->pontos_T = Utils::Multiplica(this->pontos_T, RotZ);
 }
 
 int Objeto3D::getPontosCount()

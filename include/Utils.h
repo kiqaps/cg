@@ -5,6 +5,8 @@
 #ifndef _UTILS_H
 #define _UTILS_H
 
+#define rad(grau)       (grau * M_PI / 180.0)
+
 class Utils {
 public:
     static void linhaDDA (SDL_Renderer* render, Ponto pi, Ponto pf)
@@ -38,6 +40,22 @@ public:
                 for (int k = 0; k < 4; k++) {
                     ret[i][j] += pontos[i][k] * mat[k][j];
                 }
+            }
+        }
+        return ret;
+    }
+
+    static std::vector<Ponto> Multiplica(std::vector<Ponto> pontos, std::vector< std::vector<double> > mat)
+    {
+        std::vector<Ponto> ret (pontos.size(), Ponto(0,0,0));
+    
+        for (int i = 0; i < pontos.size(); i++) {
+            for (int j = 0; j < 4; j++) {
+                double soma = 0;
+                for (int k = 0; k < 4; k++) {
+                    soma += pontos[i][k] * mat[k][j];
+                }
+                ret[i][j] = (int) soma;
             }
         }
         return ret;

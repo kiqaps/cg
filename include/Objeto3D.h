@@ -21,6 +21,8 @@ public:
         {0, 0, 50, 0}, 
         {0, 0, 0, 1} 
     };
+
+    double rx = 0, ry = 0, rz = 0;
     
     static Objeto3D create(int type);
     int getPontosCount();
@@ -37,7 +39,6 @@ public:
 
     
 private:
-    void resetTransformations();
     void applyTranslocation();
     void applyScale();
     void applyRotation();

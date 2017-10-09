@@ -129,6 +129,28 @@ void ProcessInput()
                     obj.Scale[1][1] += sinal * QTD_ESCALA;
                 else if (gMode == 5)
                     obj.Scale[2][2] += sinal * QTD_ESCALA;
+
+                else if (gMode == 6) {
+                    obj.rx += sinal * QTD_ROTACAO;
+                    if (obj.rx < 0)
+                        obj.rx = 360;
+                    else if (obj.rx > 360)
+                        obj.rx = 0;
+                }
+                else if (gMode == 7) {
+                    obj.ry += sinal * QTD_ROTACAO;
+                    if (obj.ry < 0)
+                        obj.ry = 360;
+                    else if (obj.ry > 360)
+                        obj.ry = 0;
+                }
+                else if (gMode == 8) {
+                    obj.rz += sinal * QTD_ROTACAO;
+                    if (obj.rz < 0)
+                        obj.rz = 360;
+                    else if (obj.rz > 360)
+                        obj.rz = 0;
+                }
             }
         }
     }

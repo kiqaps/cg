@@ -9,6 +9,7 @@
 
 #define QTD_TRANSLACAO          5
 #define QTD_ESCALA              5
+#define QTD_ROTACAO             10
 
 #define OBJ_Z_CONTRIBUITION     0.4
 #define OBJ_MAX_X               1000
