@@ -53,22 +53,23 @@ int main (int argc, char** argv)
     obj = Objeto3D::create(OBJ_QUADRADO);
 
     gInfoPanel = new InfoPanel(gRender, gFont);
+    gInfoPanel->addInfo("Aperte F1 para ver todos comandos");
     gInfoPanel->addInfo("MODO ATUAL:");
-    gInfoPanel->addInfo("Aperte q para translação em X");
-    gInfoPanel->addInfo("Aperte w para translação em Y");
-    gInfoPanel->addInfo("Aperte e para translação em Z");
-    gInfoPanel->addInfo("Aperte a para escalar X");
-    gInfoPanel->addInfo("Aperte s para escalar Y");
-    gInfoPanel->addInfo("Aperte d para escalar Z");
-    gInfoPanel->addInfo("Aperte z para rotacionar em torno de X");
-    gInfoPanel->addInfo("Aperte x para rotacionar em torno de Y");
-    gInfoPanel->addInfo("Aperte c para rotacionar em torno de Z");
-    gInfoPanel->addInfo(" ");
-    gInfoPanel->addInfo("Use as setas (cima e baixo) para");
-    gInfoPanel->addInfo("aplicar a transformação deseja");
+    gInfoPanel->addInfo("Aperte q para translação em X", true);
+    gInfoPanel->addInfo("Aperte w para translação em Y", true);
+    gInfoPanel->addInfo("Aperte e para translação em Z", true);
+    gInfoPanel->addInfo("Aperte a para escalar X", true);
+    gInfoPanel->addInfo("Aperte s para escalar Y", true);
+    gInfoPanel->addInfo("Aperte d para escalar Z", true);
+    gInfoPanel->addInfo("Aperte z para rotacionar em torno de X", true);
+    gInfoPanel->addInfo("Aperte x para rotacionar em torno de Y", true);
+    gInfoPanel->addInfo("Aperte c para rotacionar em torno de Z", true);
+    gInfoPanel->addInfo(" ", true);
+    gInfoPanel->addInfo("Use as setas (cima e baixo) para", true);
+    gInfoPanel->addInfo("aplicar a transformação deseja", true);
 
-    modeText.y = 1;
-    modeText.x = gInfoPanel->texturesRect[0].w + FONT_SIZE; 
+    modeText.y = gInfoPanel->texturesRect[0].h + gInfoPanel->texturesRect[0].y + 1;
+    modeText.x = gInfoPanel->texturesRect[1].w + FONT_SIZE; 
 
     loop();
 
@@ -88,7 +89,9 @@ void ProcessInput()
         }
         else if (evt.type == SDL_KEYDOWN)
         {
-            if (evt.key.keysym.sym == SDLK_q)
+            if (evt.key.keysym.sym == SDLK_F1)
+                gInfoPanel->showCollapsed(3000);
+            else if (evt.key.keysym.sym == SDLK_q)
                 gMode = 0;
             else if (evt.key.keysym.sym == SDLK_w)
                 gMode = 1;

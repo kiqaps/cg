@@ -8,11 +8,11 @@
 
 class InfoPanel {
 public:
-    std::vector<SDL_Texture*> textures;
     std::vector<SDL_Rect> texturesRect;
-
+    
     InfoPanel(SDL_Renderer* render, TTF_Font* font)
     {
+        this->time = 0;
         this->render = render;
         this->font = font;
     }
@@ -40,15 +40,34 @@ public:
 
         this->textures.push_back(nt);
         this->texturesRect.push_back(nr);
+        this->collapsed.push_back(false);
+    }
+
+    void showCollapsed(Uint32 time)
+    {
+        this->ticks = SDL_GetTicks();
+        this->time = time;
+    }
+
+    void addInfo(const char* info, bool collapsed)
+    {
+        this->addInfo(info);
+        this->collapsed[this->collapsed.size() - 1] = collapsed;
     }
 
     void draw()
     {
+        Uint32 ticks = SDL_GetTicks();
+
         for (int i = 0; i < textures.size(); i++)
-            SDL_RenderCopy(this->render, textures[i], NULL, &(texturesRect[i]));
+            if ((ticks - this->ticks) <= time || !collapsed[i])
+                SDL_RenderCopy(this->render, textures[i], NULL, &(texturesRect[i]));
     }
     
 private:
+    std::vector<bool> collapsed;
+    std::vector<SDL_Texture*> textures;
+    Uint32 time, ticks;
     SDL_Renderer* render;
     TTF_Font* font;
 };
