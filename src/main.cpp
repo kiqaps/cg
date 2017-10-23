@@ -6,7 +6,6 @@
 #include "config.h"
 #include "Ponto.h"
 #include "Objeto3D.h"
-#include "InfoPanel.h"
 
 using namespace std;
 
@@ -24,21 +23,6 @@ bool bRunning = true;
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRender = NULL;
 TTF_Font* gFont = NULL;
-InfoPanel* gInfoPanel = NULL;
-SDL_Rect modeText;
-SDL_Texture *modeTexture = NULL;
-
-char modes_names[][25] = {
-    "Translação em X",
-    "Translação em Y",
-    "Translação em Z",
-    "Escalar X",
-    "Escalar Y",
-    "Escalar Z",
-    "Rotação em torno de X",
-    "Rotação em torno de Y",
-    "Rotação em torno de Z"
-};
 
 Objeto3D obj;
 
@@ -51,26 +35,6 @@ int main (int argc, char** argv)
     }
 
     obj = Objeto3D::create(OBJ_QUADRADO);
-
-    gInfoPanel = new InfoPanel(gRender, gFont);
-    gInfoPanel->addInfo("Aperte F1 para ver todos comandos");
-    gInfoPanel->addInfo("MODO ATUAL:");
-    gInfoPanel->addInfo("Aperte q para translação em X", true);
-    gInfoPanel->addInfo("Aperte w para translação em Y", true);
-    gInfoPanel->addInfo("Aperte e para translação em Z", true);
-    gInfoPanel->addInfo("Aperte a para escalar X", true);
-    gInfoPanel->addInfo("Aperte s para escalar Y", true);
-    gInfoPanel->addInfo("Aperte d para escalar Z", true);
-    gInfoPanel->addInfo("Aperte z para rotacionar em torno de X", true);
-    gInfoPanel->addInfo("Aperte x para rotacionar em torno de Y", true);
-    gInfoPanel->addInfo("Aperte c para rotacionar em torno de Z", true);
-    gInfoPanel->addInfo(" ", true);
-    gInfoPanel->addInfo("Aperte r para resetar todas as transformações", true);
-    gInfoPanel->addInfo("Use as setas (cima e baixo) para", true);
-    gInfoPanel->addInfo("aplicar a transformação deseja", true);
-
-    modeText.y = gInfoPanel->texturesRect[0].h + gInfoPanel->texturesRect[0].y + 1;
-    modeText.x = gInfoPanel->texturesRect[1].w + FONT_SIZE; 
 
     loop();
 
@@ -90,9 +54,7 @@ void ProcessInput()
         }
         else if (evt.type == SDL_KEYDOWN)
         {
-            if (evt.key.keysym.sym == SDLK_F1)
-                gInfoPanel->showCollapsed(3000);
-            else if (evt.key.keysym.sym == SDLK_r)
+            if (evt.key.keysym.sym == SDLK_r)
             {
                 obj.Translocation[3][0] = 1;
                 obj.Translocation[3][1] = 1;
@@ -175,10 +137,6 @@ void Draw()
     SDL_RenderClear(gRender);
 
     obj.draw(gRender, 0xFF, 0x0, 0x0);
-    
-    Utils::CreateText(gRender, gFont, modes_names[gMode], {0x42, 0x44, 0xF8, 0xFF}, &modeTexture, &modeText);
-    SDL_RenderCopy(gRender, modeTexture, NULL, &modeText);
-    gInfoPanel->draw();
 }
 
 void Update()
@@ -222,8 +180,6 @@ void loop()
 
 void quit()
 {
-    delete gInfoPanel;
-    SDL_DestroyTexture(modeTexture);
     SDL_DestroyRenderer(gRender);
     SDL_DestroyWindow(gWindow);
     TTF_CloseFont(gFont);
