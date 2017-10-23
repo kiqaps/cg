@@ -31,6 +31,7 @@ public:
     void addNewPoint(Ponto p);
     void addNewLine(int p1, int p2);
     void addNewLine(Ponto p1, Ponto p2);
+    void resetTransformations();
 
     void draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b);
 
