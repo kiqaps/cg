@@ -65,6 +65,7 @@ int main (int argc, char** argv)
     gInfoPanel->addInfo("Aperte x para rotacionar em torno de Y", true);
     gInfoPanel->addInfo("Aperte c para rotacionar em torno de Z", true);
     gInfoPanel->addInfo(" ", true);
+    gInfoPanel->addInfo("Aperte r para resetar todas as transformações", true);
     gInfoPanel->addInfo("Use as setas (cima e baixo) para", true);
     gInfoPanel->addInfo("aplicar a transformação deseja", true);
 
@@ -91,6 +92,18 @@ void ProcessInput()
         {
             if (evt.key.keysym.sym == SDLK_F1)
                 gInfoPanel->showCollapsed(3000);
+            else if (evt.key.keysym.sym == SDLK_r)
+            {
+                obj.Translocation[3][0] = 1;
+                obj.Translocation[3][1] = 1;
+                obj.Translocation[3][2] = 1;
+                obj.Scale[0][0] = 50;
+                obj.Scale[1][1] = 50;
+                obj.Scale[2][2] = 50;
+                obj.rx = 0;
+                obj.ry = 0;
+                obj.rz = 0;
+            }
             else if (evt.key.keysym.sym == SDLK_q)
                 gMode = 0;
             else if (evt.key.keysym.sym == SDLK_w)

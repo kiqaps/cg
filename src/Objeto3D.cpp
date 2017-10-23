@@ -49,8 +49,8 @@ void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
     for (int i = 0; i < this->linhas.size(); i++)
     {
         Ponto p1 = this->pontos_T[this->linhas[i].first], p2 = this->pontos_T[this->linhas[i].second];
-        Ponto real1 = { (int) ((OBJ_MAX_X + p1.x) + (OBJ_MAX_Z - p1.z) * OBJ_Z_CONTRIBUITION), (int) ((OBJ_MAX_Y - p1.y) + (OBJ_MAX_Z - p1.z) * OBJ_Z_CONTRIBUITION) },
-            real2 = { (int) ((OBJ_MAX_X + p2.x) + (OBJ_MAX_Z - p2.z) * OBJ_Z_CONTRIBUITION), (int) ((OBJ_MAX_Y - p2.y) + (OBJ_MAX_Z - p2.z) * OBJ_Z_CONTRIBUITION) };
+        Ponto real1 = { (int) ((OBJ_MAX_X + p1.x) + (OBJ_MAX_Z + p1.z) * OBJ_Z_CONTRIBUITION), (int) ((OBJ_MAX_Y - p1.y) + (OBJ_MAX_Z + p1.z) * OBJ_Z_CONTRIBUITION) },
+            real2 = { (int) ((OBJ_MAX_X + p2.x) + (OBJ_MAX_Z + p2.z) * OBJ_Z_CONTRIBUITION), (int) ((OBJ_MAX_Y - p2.y) + (OBJ_MAX_Z + p2.z) * OBJ_Z_CONTRIBUITION) };
 
         real1.x = (int) (WINDOW_WIDTH * ((double) real1.x / (2.0 * OBJ_MAX_X)));
         real1.y = (int) (WINDOW_HEIGHT * ((double) real1.y / (2.0 * OBJ_MAX_Y)));
