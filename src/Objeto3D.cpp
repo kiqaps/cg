@@ -80,29 +80,29 @@ void Objeto3D::applyScale()
 
 void Objeto3D::applyRotation()
 {
-    std::vector< std::vector<double> > RotX = { 
-        {cos(rad(rx)), sin(rad(rx)), 0, 0},
-        {-sin(rad(rx)), cos(rad(rx)), 0, 0},
+    std::vector< std::vector<double> > RotZ = { 
+        {cos(rad(rz)), sin(rad(rz)), 0, 0},
+        {-sin(rad(rz)), cos(rad(rz)), 0, 0},
         {0, 0, 1, 0},
+        {0, 0, 0, 1}
+    };
+    this->pontos_T = Utils::Multiplica(this->pontos_T, RotZ);
+
+    std::vector< std::vector<double> > RotX = { 
+        {1, 0, 0, 0},
+        {0, cos(rad(rx)), sin(rad(rx)), 0},
+        {0, -sin(rad(rx)), cos(rad(rx)), 0},
         {0, 0, 0, 1}
     };
     this->pontos_T = Utils::Multiplica(this->pontos_T, RotX);
 
     std::vector< std::vector<double> > RotY = { 
-        {1, 0, 0, 0},
-        {0, cos(rad(ry)), sin(rad(ry)), 0},
-        {0, -sin(rad(ry)), cos(rad(ry)), 0},
+        {cos(rad(ry)), 0, -sin(rad(ry)), 0},
+        {0, 1, 0, 0},
+        {sin(rad(ry)), 0, cos(rad(ry)), 0},
         {0, 0, 0, 1}
     };
     this->pontos_T = Utils::Multiplica(this->pontos_T, RotY);
-
-    std::vector< std::vector<double> > RotZ = { 
-        {cos(rad(rz)), 0, -sin(rad(rz)), 0},
-        {0, 1, 0, 0},
-        {sin(rad(rz)), 0, cos(rad(rz)), 0},
-        {0, 0, 0, 1}
-    };
-    this->pontos_T = Utils::Multiplica(this->pontos_T, RotZ);
 }
 
 int Objeto3D::getPontosCount()
