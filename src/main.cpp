@@ -6,6 +6,8 @@
 #include "config.h"
 #include "Ponto.h"
 #include "Objeto3D.h"
+#include "Menu.h"
+#include "Poligono.h"
 
 using namespace std;
 
@@ -34,7 +36,7 @@ int main (int argc, char** argv)
         return 1;
     }
 
-    obj = Objeto3D::create(OBJ_QUADRADO);
+    obj = Objeto3D::create(OBJ_PIRAMIDE);
 
     loop();
 
@@ -136,7 +138,15 @@ void Draw()
     SDL_SetRenderDrawColor(gRender, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(gRender);
 
+    Menu m(gRender, gFont);
+    m.AddNewEntry({ &m, "Menu Item 1" });
+    m.AddNewEntry({ &m, "Menu Item 2" });
+    m.AddNewEntry({ &m, "Menu Item 3" });
+    m.AddNewEntry({ &m, "Menu Itemqqqqqqqqqqqqqqqqqq 4" });
+    
+
     obj.draw(gRender, 0xFF, 0x0, 0x0);
+    m.Draw(10, 10);
 }
 
 void Update()

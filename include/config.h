@@ -18,5 +18,6 @@
 
 #define OBJ_QUADRADO            10001
 #define OBJ_PIRAMIDE            10002
+#define OBJ_ESTRELA             10003
 
 #endif
