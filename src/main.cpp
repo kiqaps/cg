@@ -22,6 +22,16 @@ void quit();
 void CreateText(SDL_Renderer* render, TTF_Font* font, const char* text, SDL_Color color, SDL_Texture** texture, SDL_Rect* rect);
 
 int gMode = 0;
+char mode_name[][25] = {
+    "Translação em X", "Translação em Y", "Translação em Z",
+    "Escala em X", "Escala em Y", "Escala em Z",
+    "Rotação entorno de X", "Rotação entorno de Y", "Rotação entorno de Z"
+};
+
+SDL_Texture* gModeInfoTex = NULL;
+SDL_Texture* gModeText = NULL;
+SDL_Rect gModeRect, gModeInfoRect;
+
 bool bRunning = true;
 SDL_Window* gWindow = NULL;
 SDL_Renderer* gRender = NULL;
@@ -59,23 +69,13 @@ void ProcessInput()
         }
         else if (evt.type == SDL_MOUSEBUTTONDOWN && evt.button.button == SDL_BUTTON_RIGHT)
         {
-            cout << "oi antes de entrar" << endl;
             gMenu->Show(evt.button.x, evt.button.y);
-            cout << "oi dps de sair" << endl;
         }
         else if (evt.type == SDL_KEYDOWN)
         {
             if (evt.key.keysym.sym == SDLK_r)
             {
-                gObj->Translocation[3][0] = 1;
-                gObj->Translocation[3][1] = 1;
-                gObj->Translocation[3][2] = 1;
-                gObj->Scale[0][0] = 50;
-                gObj->Scale[1][1] = 50;
-                gObj->Scale[2][2] = 50;
-                gObj->rx = 0;
-                gObj->ry = 0;
-                gObj->rz = 0;
+                
             }
             else if (evt.key.keysym.sym == SDLK_q)
                 gMode = 0;
@@ -147,6 +147,13 @@ void Draw()
     SDL_SetRenderDrawColor(gRender, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(gRender);    
 
+    Utils::CreateText(gRender, gFont, mode_name[gMode], {0x0, 0x0, 0xFF}, &gModeText, &gModeRect);
+    gModeRect.x = gModeInfoRect.x + gModeInfoRect.w;
+    gModeRect.y = gModeInfoRect.y;
+
+    SDL_RenderCopy(gRender, gModeInfoTex, NULL, &gModeInfoRect);
+    SDL_RenderCopy(gRender, gModeText, NULL, &gModeRect);
+
     gObj->draw(gRender, 0xFF, 0x0, 0x0);
 }
 
@@ -179,10 +186,24 @@ void setup()
     gObj = Objeto3D::create(OBJ_CUBO);
 
     gMenu = new Menu(gRender, gFont);
-    gMenu->AddNewEntry("Menu Item 1");
-    gMenu->AddNewEntry("Menu Item 2");
+    gMenu->AddNewEntry("Resetar Objeto", [] {
+        gObj->Translocation[3][0] = 1;
+        gObj->Translocation[3][1] = 1;
+        gObj->Translocation[3][2] = 1;
+        gObj->Scale[0][0] = 50;
+        gObj->Scale[1][1] = 50;
+        gObj->Scale[2][2] = 50;
+        gObj->rx = 0;
+        gObj->ry = 0;
+        gObj->rz = 0;
+    });
+    gMenu->AddNewEntry("Modo");
     gMenu->AddNewEntry("Menu Item 3");
     gMenu->AddNewEntry("Menu Item 4");
+
+    Utils::CreateText(gRender, gFont, "MODO: ", {0x0, 0x0, 0x0}, &gModeInfoTex, &gModeInfoRect);
+    gModeInfoRect.x = 1;
+    gModeInfoRect.y = 1;
 }
 
 void loop()
@@ -205,6 +226,8 @@ void quit()
 {
     delete gObj;
     delete gMenu;
+    SDL_DestroyTexture(gModeInfoTex);
+    SDL_DestroyTexture(gModeText);
     SDL_DestroyRenderer(gRender);
     SDL_DestroyWindow(gWindow);
     TTF_CloseFont(gFont);
