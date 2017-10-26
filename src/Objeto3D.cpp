@@ -2,35 +2,35 @@
 #include "Utils.h"
 #include "config.h"
 
-Objeto3D Objeto3D::create(int type)
+Objeto3D* Objeto3D::create(int type)
 {
-    Objeto3D obj;
-    if (type == OBJ_QUADRADO)
+    Objeto3D* obj = new Objeto3D();
+    if (type == OBJ_CUBO)
     {
-        obj.addNewLine({1, 1, 1}, {-1, 1, 1});
-        obj.addNewLine({1, -1, 1}, {-1, -1, 1});
-        obj.addNewLine({1, 1, -1}, {-1, 1, -1});
-        obj.addNewLine({1, -1, -1}, {-1, -1, -1});
-        obj.addNewLine(0, 2);
-        obj.addNewLine(0, 4);
-        obj.addNewLine(1, 3);
-        obj.addNewLine(1, 5);
-        obj.addNewLine(2, 6);
-        obj.addNewLine(3, 7);
-        obj.addNewLine(4, 6);
-        obj.addNewLine(5, 7);
+        obj->addNewLine({1, 1, 1}, {-1, 1, 1});
+        obj->addNewLine({1, -1, 1}, {-1, -1, 1});
+        obj->addNewLine({1, 1, -1}, {-1, 1, -1});
+        obj->addNewLine({1, -1, -1}, {-1, -1, -1});
+        obj->addNewLine(0, 2);
+        obj->addNewLine(0, 4);
+        obj->addNewLine(1, 3);
+        obj->addNewLine(1, 5);
+        obj->addNewLine(2, 6);
+        obj->addNewLine(3, 7);
+        obj->addNewLine(4, 6);
+        obj->addNewLine(5, 7);
     }
     else if (type == OBJ_PIRAMIDE)
     {
-        obj.addNewPoint({0, 1, 0});
-        obj.addNewLine({1, -1, 1}, {1, -1, -1});
-        obj.addNewLine({-1, -1, -1}, {-1, -1, 1});
-        obj.addNewLine(2, 3);
-        obj.addNewLine(4, 1);
-        obj.addNewLine(0, 1);
-        obj.addNewLine(0, 2);
-        obj.addNewLine(0, 3);
-        obj.addNewLine(0, 4);
+        obj->addNewPoint({0, 1, 0});
+        obj->addNewLine({1, -1, 1}, {1, -1, -1});
+        obj->addNewLine({-1, -1, -1}, {-1, -1, 1});
+        obj->addNewLine(2, 3);
+        obj->addNewLine(4, 1);
+        obj->addNewLine(0, 1);
+        obj->addNewLine(0, 2);
+        obj->addNewLine(0, 3);
+        obj->addNewLine(0, 4);
     }
     return obj;
 }

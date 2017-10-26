@@ -24,7 +24,7 @@ public:
 
     double rx = 0, ry = 0, rz = 0;
     
-    static Objeto3D create(int type);
+    static Objeto3D* create(int type);
     int getPontosCount();
     int getLinhasCount();
     

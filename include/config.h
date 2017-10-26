@@ -16,7 +16,7 @@
 #define OBJ_MAX_Y               750
 #define OBJ_MAX_Z               0
 
-#define OBJ_QUADRADO            10001
+#define OBJ_CUBO                10001
 #define OBJ_PIRAMIDE            10002
 #define OBJ_ESTRELA             10003
 

@@ -12,27 +12,43 @@ class MenuEntry;
 
 class Menu {
 public:
+    Menu();
+    ~Menu();
     Menu(SDL_Renderer* render, TTF_Font* font);
-    void AddNewEntry(MenuEntry entry);
-    void Draw(int x, int y);
+    void AddNewEntry(std::string text);
+    
+    void Show(int x, int y);
+
+    SDL_Renderer* getRender();
+    TTF_Font* getFont();
 
 private:
-    int height, width;
+    void ProcessInput();
+    void Draw();
+    void Update();
+    
+    bool showing = false;
+    int x, y, height, width;
     Menu* parent;
-    std::vector<MenuEntry> entries;
+    std::vector<MenuEntry*> entries;
     SDL_Renderer* render;
     TTF_Font* font;
-    std::vector<SDL_Texture*> _textures;
-    std::vector<SDL_Rect> _rects;
 };
 
 class MenuEntry {
 public:
+    ~MenuEntry();
     MenuEntry (Menu* menu, std::string text);
     std::string getText();
+
+    SDL_Texture* getTexture();
+    SDL_Rect getRect();
+
 private:
-    Menu* menu;
-    Menu* child;
+    SDL_Texture* texture = NULL;
+    SDL_Rect rect;
+    Menu* menu = NULL;
+    Menu* child = NULL;
     bool hasChild;
     std::string text;
 };

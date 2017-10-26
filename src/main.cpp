@@ -12,6 +12,7 @@
 using namespace std;
 
 int init();
+void setup();
 void loop();
 void ProcessInput();
 void Draw();
@@ -26,7 +27,8 @@ SDL_Window* gWindow = NULL;
 SDL_Renderer* gRender = NULL;
 TTF_Font* gFont = NULL;
 
-Objeto3D obj;
+Menu* gMenu = NULL;
+Objeto3D* gObj = NULL;
 
 int main (int argc, char** argv)
 {
@@ -36,7 +38,8 @@ int main (int argc, char** argv)
         return 1;
     }
 
-    obj = Objeto3D::create(OBJ_PIRAMIDE);
+    // Configura os objetos e menus
+    setup();
 
     loop();
 
@@ -54,19 +57,25 @@ void ProcessInput()
             bRunning = false;
             break;
         }
+        else if (evt.type == SDL_MOUSEBUTTONDOWN && evt.button.button == SDL_BUTTON_RIGHT)
+        {
+            cout << "oi antes de entrar" << endl;
+            gMenu->Show(evt.button.x, evt.button.y);
+            cout << "oi dps de sair" << endl;
+        }
         else if (evt.type == SDL_KEYDOWN)
         {
             if (evt.key.keysym.sym == SDLK_r)
             {
-                obj.Translocation[3][0] = 1;
-                obj.Translocation[3][1] = 1;
-                obj.Translocation[3][2] = 1;
-                obj.Scale[0][0] = 50;
-                obj.Scale[1][1] = 50;
-                obj.Scale[2][2] = 50;
-                obj.rx = 0;
-                obj.ry = 0;
-                obj.rz = 0;
+                gObj->Translocation[3][0] = 1;
+                gObj->Translocation[3][1] = 1;
+                gObj->Translocation[3][2] = 1;
+                gObj->Scale[0][0] = 50;
+                gObj->Scale[1][1] = 50;
+                gObj->Scale[2][2] = 50;
+                gObj->rx = 0;
+                gObj->ry = 0;
+                gObj->rz = 0;
             }
             else if (evt.key.keysym.sym == SDLK_q)
                 gMode = 0;
@@ -94,39 +103,39 @@ void ProcessInput()
                     sinal = 1;
 
                 if (gMode == 0)
-                    obj.Translocation[3][0] += sinal * QTD_TRANSLACAO;
+                    gObj->Translocation[3][0] += sinal * QTD_TRANSLACAO;
                 else if (gMode == 1)
-                    obj.Translocation[3][1] += sinal * QTD_TRANSLACAO;
+                    gObj->Translocation[3][1] += sinal * QTD_TRANSLACAO;
                 else if (gMode == 2)
-                    obj.Translocation[3][2] += sinal * QTD_TRANSLACAO;
+                    gObj->Translocation[3][2] += sinal * QTD_TRANSLACAO;
 
                 else if (gMode == 3)
-                    obj.Scale[0][0] += sinal * QTD_ESCALA;
+                    gObj->Scale[0][0] += sinal * QTD_ESCALA;
                 else if (gMode == 4)
-                    obj.Scale[1][1] += sinal * QTD_ESCALA;
+                    gObj->Scale[1][1] += sinal * QTD_ESCALA;
                 else if (gMode == 5)
-                    obj.Scale[2][2] += sinal * QTD_ESCALA;
+                    gObj->Scale[2][2] += sinal * QTD_ESCALA;
 
                 else if (gMode == 6) {
-                    obj.rx += sinal * QTD_ROTACAO;
-                    if (obj.rx < 0)
-                        obj.rx = 360;
-                    else if (obj.rx > 360)
-                        obj.rx = 0;
+                    gObj->rx += sinal * QTD_ROTACAO;
+                    if (gObj->rx < 0)
+                        gObj->rx = 360;
+                    else if (gObj->rx > 360)
+                        gObj->rx = 0;
                 }
                 else if (gMode == 7) {
-                    obj.ry += sinal * QTD_ROTACAO;
-                    if (obj.ry < 0)
-                        obj.ry = 360;
-                    else if (obj.ry > 360)
-                        obj.ry = 0;
+                    gObj->ry += sinal * QTD_ROTACAO;
+                    if (gObj->ry < 0)
+                        gObj->ry = 360;
+                    else if (gObj->ry > 360)
+                        gObj->ry = 0;
                 }
                 else if (gMode == 8) {
-                    obj.rz += sinal * QTD_ROTACAO;
-                    if (obj.rz < 0)
-                        obj.rz = 360;
-                    else if (obj.rz > 360)
-                        obj.rz = 0;
+                    gObj->rz += sinal * QTD_ROTACAO;
+                    if (gObj->rz < 0)
+                        gObj->rz = 360;
+                    else if (gObj->rz > 360)
+                        gObj->rz = 0;
                 }
             }
         }
@@ -136,17 +145,9 @@ void ProcessInput()
 void Draw()
 {  
     SDL_SetRenderDrawColor(gRender, 0xFF, 0xFF, 0xFF, 0xFF);
-    SDL_RenderClear(gRender);
+    SDL_RenderClear(gRender);    
 
-    Menu m(gRender, gFont);
-    m.AddNewEntry({ &m, "Menu Item 1" });
-    m.AddNewEntry({ &m, "Menu Item 2" });
-    m.AddNewEntry({ &m, "Menu Item 3" });
-    m.AddNewEntry({ &m, "Menu Itemqqqqqqqqqqqqqqqqqq 4" });
-    
-
-    obj.draw(gRender, 0xFF, 0x0, 0x0);
-    m.Draw(10, 10);
+    gObj->draw(gRender, 0xFF, 0x0, 0x0);
 }
 
 void Update()
@@ -173,23 +174,37 @@ int init()
     return 0;
 }
 
+void setup()
+{
+    gObj = Objeto3D::create(OBJ_CUBO);
+
+    gMenu = new Menu(gRender, gFont);
+    gMenu->AddNewEntry("Menu Item 1");
+    gMenu->AddNewEntry("Menu Item 2");
+    gMenu->AddNewEntry("Menu Item 3");
+    gMenu->AddNewEntry("Menu Item 4");
+}
+
 void loop()
 {
     Uint32 sTicks;
     while (bRunning)
     {
         sTicks = SDL_GetTicks();
-
+        
         ProcessInput();
         Draw();
         Update();
 
-        SDL_Delay(30 - (SDL_GetTicks() - sTicks));
+        Uint32 espera = 30 - (SDL_GetTicks() - sTicks);
+        SDL_Delay(espera > 30 ? 30 : espera);
     }
 }
 
 void quit()
 {
+    delete gObj;
+    delete gMenu;
     SDL_DestroyRenderer(gRender);
     SDL_DestroyWindow(gWindow);
     TTF_CloseFont(gFont);
