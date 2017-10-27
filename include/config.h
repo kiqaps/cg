@@ -16,6 +16,10 @@
 #define OBJ_MAX_Y               750
 #define OBJ_MAX_Z               0
 
+#define OBJ_PROJ_CAVALEIRA      1001
+#define OBJ_PROJ_CABINET        1002
+#define OBJ_PROJ_1PTFUGA        1003
+
 #define OBJ_CUBO                10001
 #define OBJ_PIRAMIDE            10002
 #define OBJ_ESTRELA             10003

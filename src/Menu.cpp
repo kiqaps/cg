@@ -6,6 +6,7 @@
 Menu::Menu() { }
 Menu::~Menu() 
 {
+    SDL_DestroyTexture(this->submenuMark);
     for (int i = 0; i < this->entries.size(); i++)
     {
         delete this->entries[i];

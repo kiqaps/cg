@@ -8,11 +8,12 @@
 
 class Objeto3D {
 public:
+    Objeto3D();
     std::vector< std::vector<int> > Translocation = { 
         {1, 0, 0, 0}, 
         {0, 1, 0, 0}, 
         {0, 0, 1, 0}, 
-        {1, 1, 1, 1} 
+        {0, 0, 0, 1} 
     };
 
     std::vector< std::vector<int> > Scale = { 
@@ -38,11 +39,13 @@ public:
     Ponto& operator[] (int idx);
     friend std::ostream& operator<< (std::ostream& strm, const Objeto3D& p);
 
+    int projection;
     
 private:
     void applyTranslocation();
     void applyScale();
     void applyRotation();
+    void applyProjection();
     std::vector<Ponto> pontos_T;
     std::vector<Ponto> pontos;
     std::vector< std::pair<int, int> > linhas;

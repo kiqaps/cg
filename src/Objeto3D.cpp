@@ -2,6 +2,8 @@
 #include "Utils.h"
 #include "config.h"
 
+#include <iostream>
+
 Objeto3D* Objeto3D::create(int type)
 {
     Objeto3D* obj = new Objeto3D();
@@ -46,6 +48,11 @@ Objeto3D* Objeto3D::create(int type)
     return obj;
 }
 
+Objeto3D::Objeto3D()
+{
+    this->projection = OBJ_PROJ_1PTFUGA;
+}
+
 void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
 {
     Uint8 before[4];
@@ -57,21 +64,86 @@ void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
     this->applyRotation();
     this->applyTranslocation();
 
+    // Ajusta as coordenadas para a tela
+    for (int i = 0; i < this->pontos_T.size(); i++)
+    {
+        this->pontos_T[i][0] += OBJ_MAX_X;
+        this->pontos_T[i][1] = OBJ_MAX_Y - this->pontos_T[i][1];
+        this->pontos_T[i][2] += OBJ_MAX_Z;
+    }
+
+    std::cout << "Before" << std::endl;
+    for (int i = 0; i < pontos_T.size(); i++)
+    {
+        std::cout << pontos_T[i][0];
+        std::cout << " " << pontos_T[i][1];
+        std::cout << " " << pontos_T[i][2];
+        std::cout << " " << pontos_T[i][3] << std::endl;        
+    }
+
+    this->applyProjection();
+
+    std::cout << "after" << std::endl;
+    for (int i = 0; i < pontos_T.size(); i++)
+    {
+        std::cout << pontos_T[i][0];
+        std::cout << " " << pontos_T[i][1];
+        std::cout << " " << pontos_T[i][2];
+        std::cout << " " << pontos_T[i][3] << std::endl;        
+    }
+
+        int ik; std::cin >> ik;
     for (int i = 0; i < this->linhas.size(); i++)
     {
         Ponto p1 = this->pontos_T[this->linhas[i].first], p2 = this->pontos_T[this->linhas[i].second];
-        Ponto real1 = { (int) ((OBJ_MAX_X + p1.x) + (OBJ_MAX_Z + p1.z) * OBJ_Z_CONTRIBUITION), (int) ((OBJ_MAX_Y - p1.y) + (OBJ_MAX_Z + p1.z) * OBJ_Z_CONTRIBUITION) },
-            real2 = { (int) ((OBJ_MAX_X + p2.x) + (OBJ_MAX_Z + p2.z) * OBJ_Z_CONTRIBUITION), (int) ((OBJ_MAX_Y - p2.y) + (OBJ_MAX_Z + p2.z) * OBJ_Z_CONTRIBUITION) };
+        
+        p1.x = (int) ((double) p1.x / p1.m);
+        p1.y = (int) ((double) p1.y / p1.m);
+        p2.x = (int) ((double) p2.x / p2.m);
+        p2.y = (int) ((double) p2.y / p2.m);
+        
+        p1.x = (int) (WINDOW_WIDTH * ((double) p1.x / (2.0 * OBJ_MAX_X)));
+        p1.y = (int) (WINDOW_HEIGHT * ((double) p1.y / (2.0 * OBJ_MAX_Y)));
+        p2.x = (int) (WINDOW_WIDTH * ((double) p2.x / (2.0 * OBJ_MAX_X)));
+        p2.y = (int) (WINDOW_HEIGHT * ((double) p2.y / (2.0 * OBJ_MAX_Y)));
 
-        real1.x = (int) (WINDOW_WIDTH * ((double) real1.x / (2.0 * OBJ_MAX_X)));
-        real1.y = (int) (WINDOW_HEIGHT * ((double) real1.y / (2.0 * OBJ_MAX_Y)));
-        real2.x = (int) (WINDOW_WIDTH * ((double) real2.x / (2.0 * OBJ_MAX_X)));
-        real2.y = (int) (WINDOW_HEIGHT * ((double) real2.y / (2.0 * OBJ_MAX_Y)));
-
-        Utils::linhaDDA(renderer, real1, real2);
+        Utils::linhaDDA(renderer, p1, p2);
     }
 
     SDL_SetRenderDrawColor(renderer, before[0], before[1], before[2], before[3]);
+}
+
+void Objeto3D::applyProjection()
+{
+    std::vector< std::vector<double> > projMat;
+    if (this->projection == OBJ_PROJ_CAVALEIRA)
+    {
+        projMat = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {cos(rad(45)), sin(rad(45)), 0, 0},
+            {0, 0, 0, 1}
+        };
+    }
+    else if (this->projection == OBJ_PROJ_CABINET)
+    {
+        projMat = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0.5 * cos(rad(63.4)), 0.5 * sin(rad(63.4)), 0, 0},
+            {0, 0, 0, 1}
+        };
+    }
+    else if (this->projection == OBJ_PROJ_1PTFUGA)
+    {
+        projMat = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 0, -1.0/50.0},
+            {0, 0, 0, 1}
+        };
+    }
+    this->pontos_T = Utils::Multiplica(this->pontos_T, projMat);
 }
 
 void Objeto3D::resetTransformations()

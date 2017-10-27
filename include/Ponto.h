@@ -8,6 +8,7 @@ public:
     int x, y, z, m;
     Ponto(int x, int y);
     Ponto(int x, int y, int z);
+    Ponto(int x, int y, int z, int m);
 
     int& operator[] (int idx);
     friend std::ostream& operator<< (std::ostream& strm, const Ponto& p);

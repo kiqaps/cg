@@ -236,6 +236,11 @@ void setup()
     modoEntry->submenu->AddNewEntry("Rotação entorno de Y", [] { gMode = 7; });
     modoEntry->submenu->AddNewEntry("Rotação entorno de Z", [] { gMode = 8; });
 
+    MenuEntry* projEntry = gMenu->AddNewEntry("Projeção", new Menu(gRender, gFont));
+    projEntry->submenu->AddNewEntry("Cavaleira", [] { gObj->projection = OBJ_PROJ_CAVALEIRA; });
+    projEntry->submenu->AddNewEntry("Cabinet", [] { gObj->projection = OBJ_PROJ_CABINET; });
+    projEntry->submenu->AddNewEntry("1 Ponto de Fuga", [] { gObj->projection = OBJ_PROJ_1PTFUGA; });
+
     Utils::CreateText(gRender, gFont, "MODO: ", {0x0, 0x0, 0x0}, &gModeInfoTex, &gModeInfoRect);
     gModeInfoRect.x = 1;
     gModeInfoRect.y = 1;
