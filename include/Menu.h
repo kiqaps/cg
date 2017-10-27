@@ -16,8 +16,9 @@ public:
     Menu();
     ~Menu();
     Menu(SDL_Renderer* render, TTF_Font* font);
-    void AddNewEntry(std::string text);
-    void AddNewEntry(std::string text, std::function<void()> callback);
+    MenuEntry* AddNewEntry(std::string text);
+    MenuEntry* AddNewEntry(std::string text, Menu* menu);
+    MenuEntry* AddNewEntry(std::string text, std::function<void()> callback);
     
     void Show(int x, int y);
 
@@ -25,15 +26,17 @@ public:
     TTF_Font* getFont();
 
     bool showing = false;
-
+    Menu* parent;
 private:
+    SDL_Texture* submenuMark = NULL;
+    SDL_Rect submenuRect;
     void ProcessInput();
     void Draw();
     void Update();
     
     bool clicked = false;
     int clickedX, clickedY, curX, curY, x, y, height, width;
-    Menu* parent;
+    
     std::vector<MenuEntry*> entries;
     SDL_Renderer* render;
     TTF_Font* font;
@@ -50,13 +53,11 @@ public:
     SDL_Rect getRect();
 
     std::function<void()> callback;
-
+    Menu* submenu = NULL;
+    Menu* menu = NULL;
 private:
     SDL_Texture* texture = NULL;
     SDL_Rect rect;
-    Menu* menu = NULL;
-    Menu* child = NULL;
-    bool hasChild;
     std::string text;
 };
 

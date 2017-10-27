@@ -73,29 +73,7 @@ void ProcessInput()
         }
         else if (evt.type == SDL_KEYDOWN)
         {
-            if (evt.key.keysym.sym == SDLK_r)
-            {
-                
-            }
-            else if (evt.key.keysym.sym == SDLK_q)
-                gMode = 0;
-            else if (evt.key.keysym.sym == SDLK_w)
-                gMode = 1;
-            else if (evt.key.keysym.sym == SDLK_e)
-                gMode = 2;
-            else if (evt.key.keysym.sym == SDLK_a)
-                gMode = 3;
-            else if (evt.key.keysym.sym == SDLK_s)
-                gMode = 4;
-            else if (evt.key.keysym.sym == SDLK_d)
-                gMode = 5;
-            else if (evt.key.keysym.sym == SDLK_z)
-                gMode = 6;
-            else if (evt.key.keysym.sym == SDLK_x)
-                gMode = 7;
-            else if (evt.key.keysym.sym == SDLK_c)
-                gMode = 8;
-            else if (evt.key.keysym.sym == SDLK_UP || evt.key.keysym.sym == SDLK_DOWN)
+            if (evt.key.keysym.sym == SDLK_UP || evt.key.keysym.sym == SDLK_DOWN)
             {
                 int sinal = -1;
 
@@ -119,25 +97,70 @@ void ProcessInput()
                 else if (gMode == 6) {
                     gObj->rx += sinal * QTD_ROTACAO;
                     if (gObj->rx < 0)
-                        gObj->rx = 360;
+                        gObj->rx = 350;
                     else if (gObj->rx > 360)
-                        gObj->rx = 0;
+                        gObj->rx = 10;
                 }
                 else if (gMode == 7) {
                     gObj->ry += sinal * QTD_ROTACAO;
                     if (gObj->ry < 0)
-                        gObj->ry = 360;
+                        gObj->ry = 350;
                     else if (gObj->ry > 360)
-                        gObj->ry = 0;
+                        gObj->ry = 10;
                 }
                 else if (gMode == 8) {
                     gObj->rz += sinal * QTD_ROTACAO;
                     if (gObj->rz < 0)
-                        gObj->rz = 360;
+                        gObj->rz = 350;
                     else if (gObj->rz > 360)
-                        gObj->rz = 0;
+                        gObj->rz = 10;
                 }
             }
+        }
+
+        else if (evt.type == SDL_MOUSEWHEEL)
+        {
+            int sinal = -1;
+
+            if (evt.wheel.y == 1)
+                sinal = 1;
+
+            if (gMode == 0)
+                gObj->Translocation[3][0] += sinal * QTD_TRANSLACAO;
+            else if (gMode == 1)
+                gObj->Translocation[3][1] += sinal * QTD_TRANSLACAO;
+            else if (gMode == 2)
+                gObj->Translocation[3][2] += sinal * QTD_TRANSLACAO;
+
+            else if (gMode == 3)
+                gObj->Scale[0][0] += sinal * QTD_ESCALA;
+            else if (gMode == 4)
+                gObj->Scale[1][1] += sinal * QTD_ESCALA;
+            else if (gMode == 5)
+                gObj->Scale[2][2] += sinal * QTD_ESCALA;
+
+            else if (gMode == 6) {
+                gObj->rx += sinal * QTD_ROTACAO;
+                if (gObj->rx < 0)
+                    gObj->rx = 360;
+                else if (gObj->rx > 360)
+                    gObj->rx = 0;
+            }
+            else if (gMode == 7) {
+                gObj->ry += sinal * QTD_ROTACAO;
+                if (gObj->ry < 0)
+                    gObj->ry = 360;
+                else if (gObj->ry > 360)
+                    gObj->ry = 0;
+            }
+            else if (gMode == 8) {
+                gObj->rz += sinal * QTD_ROTACAO;
+                if (gObj->rz < 0)
+                    gObj->rz = 360;
+                else if (gObj->rz > 360)
+                    gObj->rz = 0;
+            }
+            
         }
     }
 }
@@ -197,9 +220,21 @@ void setup()
         gObj->ry = 0;
         gObj->rz = 0;
     });
-    gMenu->AddNewEntry("Modo");
-    gMenu->AddNewEntry("Menu Item 3");
-    gMenu->AddNewEntry("Menu Item 4");
+
+    MenuEntry* formaEntry = gMenu->AddNewEntry("Forma", new Menu(gRender, gFont));
+    formaEntry->submenu->AddNewEntry("Cubo", [] { gObj = Objeto3D::create(OBJ_CUBO); });
+    formaEntry->submenu->AddNewEntry("Piramide", [] { gObj = Objeto3D::create(OBJ_PIRAMIDE); });
+
+    MenuEntry* modoEntry = gMenu->AddNewEntry("Transformação", new Menu(gRender, gFont));
+    modoEntry->submenu->AddNewEntry("Translação em X", [] { gMode = 0; });
+    modoEntry->submenu->AddNewEntry("Translação em Y", [] { gMode = 1; });
+    modoEntry->submenu->AddNewEntry("Translação em Z", [] { gMode = 2; });
+    modoEntry->submenu->AddNewEntry("Escala em X", [] { gMode = 3; });
+    modoEntry->submenu->AddNewEntry("Escala em Y", [] { gMode = 4; });
+    modoEntry->submenu->AddNewEntry("Escala em Z", [] { gMode = 5; });
+    modoEntry->submenu->AddNewEntry("Rotação entorno de X", [] { gMode = 6; });
+    modoEntry->submenu->AddNewEntry("Rotação entorno de Y", [] { gMode = 7; });
+    modoEntry->submenu->AddNewEntry("Rotação entorno de Z", [] { gMode = 8; });
 
     Utils::CreateText(gRender, gFont, "MODO: ", {0x0, 0x0, 0x0}, &gModeInfoTex, &gModeInfoRect);
     gModeInfoRect.x = 1;

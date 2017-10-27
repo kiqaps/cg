@@ -5,6 +5,17 @@
 Objeto3D* Objeto3D::create(int type)
 {
     Objeto3D* obj = new Objeto3D();
+
+    obj->Translocation[3][0] = 1;
+    obj->Translocation[3][1] = 1;
+    obj->Translocation[3][2] = 1;
+    obj->Scale[0][0] = 50;
+    obj->Scale[1][1] = 50;
+    obj->Scale[2][2] = 50;
+    obj->rx = 0;
+    obj->ry = 0;
+    obj->rz = 0;
+
     if (type == OBJ_CUBO)
     {
         obj->addNewLine({1, 1, 1}, {-1, 1, 1});
