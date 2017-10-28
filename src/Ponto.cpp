@@ -1,6 +1,6 @@
 #include "Ponto.h"
 
-Ponto::Ponto(int x, int y)
+Ponto::Ponto(double x, double y)
 {
     this->x = x;
     this->y = y;
@@ -8,7 +8,7 @@ Ponto::Ponto(int x, int y)
     this->xyz = false;
 }
 
-Ponto::Ponto(int x, int y, int z)
+Ponto::Ponto(double x, double y, double z)
 {
     this->x = x;
     this->y = y;
@@ -17,7 +17,7 @@ Ponto::Ponto(int x, int y, int z)
     this->xyz = true;
 }
 
-Ponto::Ponto(int x, int y, int z, int m)
+Ponto::Ponto(double x, double y, double z, double m)
 {
     this->x = x;
     this->y = y;
@@ -26,7 +26,7 @@ Ponto::Ponto(int x, int y, int z, int m)
     this->xyz = true;
 }
 
-int& Ponto::operator[] (int idx)
+double& Ponto::operator[] (int idx)
 {
     if (idx == 0) return this->x;
     else if (idx == 1) return this->y;

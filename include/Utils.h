@@ -11,23 +11,23 @@ class Utils {
 public:
     static void linhaDDA (SDL_Renderer* render, Ponto pi, Ponto pf)
     {
-        int dx = pf.x - pi.x, dy = pf.y - pi.y, passos;
-        float incX, incY, x = pi.x, y = pi.y;
+        int dx = rint(pf.x - pi.x), dy = rint(pf.y - pi.y), passos;
+        double incX, incY, x = pi.x, y = pi.y;
     
         if (abs(dx) > abs(dy))
             passos = abs(dx);
         else
             passos = abs(dy);
     
-        incX = dx / (float) passos;
-        incY = dy / (float) passos;
+        incX = dx / (double) passos;
+        incY = dy / (double) passos;
     
-        SDL_RenderDrawPoint(render, (int) x, (int) y);
+        SDL_RenderDrawPoint(render, (int) rint(x), (int) rint(y));
         for (int k = 0; k < passos; k++)
         {
             x += incX;
             y += incY;
-            SDL_RenderDrawPoint(render, (int) x, (int) y);
+            SDL_RenderDrawPoint(render, (int) rint(x), (int) rint(y));
         }
     }
     
@@ -55,7 +55,7 @@ public:
                 for (int k = 0; k < 4; k++) {
                     soma += pontos[i][k] * mat[k][j];
                 }
-                ret[i][j] = (int) soma;
+                ret[i][j] = soma;
             }
         }
         return ret;
