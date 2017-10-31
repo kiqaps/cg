@@ -28,9 +28,15 @@ char mode_name[][25] = {
     "Rotação entorno de X", "Rotação entorno de Y", "Rotação entorno de Z"
 };
 
+char proj_name[][20] = {
+    "Cavaleira", "Cabinet", "1 ponto de Fuga"
+};
+
+SDL_Texture* gProjInfoTex = NULL;
+SDL_Texture* gProjText = NULL;
 SDL_Texture* gModeInfoTex = NULL;
 SDL_Texture* gModeText = NULL;
-SDL_Rect gModeRect, gModeInfoRect;
+SDL_Rect gModeRect, gModeInfoRect, gProjInfoRect, gProjRect;
 
 bool bRunning = true;
 SDL_Window* gWindow = NULL;
@@ -170,14 +176,19 @@ void Draw()
     SDL_SetRenderDrawColor(gRender, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(gRender);    
 
+    gObj->draw(gRender, 0xFF, 0x0, 0x0);
+
     Utils::CreateText(gRender, gFont, mode_name[gMode], {0x0, 0x0, 0xFF}, &gModeText, &gModeRect);
+    Utils::CreateText(gRender, gFont, proj_name[gObj->projection], {0x0, 0x0, 0xFF}, &gProjText, &gProjRect);
     gModeRect.x = gModeInfoRect.x + gModeInfoRect.w;
     gModeRect.y = gModeInfoRect.y;
+    gProjRect.x = gProjInfoRect.x + gProjInfoRect.w;
+    gProjRect.y = gProjInfoRect.y;
 
     SDL_RenderCopy(gRender, gModeInfoTex, NULL, &gModeInfoRect);
+    SDL_RenderCopy(gRender, gProjInfoTex, NULL, &gProjInfoRect);
     SDL_RenderCopy(gRender, gModeText, NULL, &gModeRect);
-
-    gObj->draw(gRender, 0xFF, 0x0, 0x0);
+    SDL_RenderCopy(gRender, gProjText, NULL, &gProjRect);
 }
 
 void Update()
@@ -241,9 +252,12 @@ void setup()
     projEntry->submenu->AddNewEntry("Cabinet", [] { gObj->projection = OBJ_PROJ_CABINET; });
     projEntry->submenu->AddNewEntry("1 Ponto de Fuga", [] { gObj->projection = OBJ_PROJ_1PTFUGA; });
 
-    Utils::CreateText(gRender, gFont, "MODO: ", {0x0, 0x0, 0x0}, &gModeInfoTex, &gModeInfoRect);
+    Utils::CreateText(gRender, gFont, "Transformação: ", {0x0, 0x0, 0x0}, &gModeInfoTex, &gModeInfoRect);
+    Utils::CreateText(gRender, gFont, "Projeção: ", {0x0, 0x0, 0x0}, &gProjInfoTex, &gProjInfoRect);
     gModeInfoRect.x = 1;
     gModeInfoRect.y = 1;
+    gProjInfoRect.x = 1;
+    gProjInfoRect.y = 4 + gModeInfoRect.h;
 }
 
 void loop()
