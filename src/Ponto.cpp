@@ -38,6 +38,6 @@ std::ostream& operator<< (std::ostream& strm, const Ponto& p)
 {
     strm << "Ponto(" << p.x << ", " << p.y;
     if (p.xyz) strm << ", " << p.z;
-    strm << ")";
+    strm << ", " << p.m << ")";
     return strm;
 }

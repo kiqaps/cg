@@ -64,37 +64,37 @@ void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
     this->applyRotation();
     this->applyTranslocation();
 
-    // Ajusta as coordenadas para a tela
+    double menorZ = 0;
+
+    // Corrige as coordenadas, define o centro no meio da tela
     for (int i = 0; i < this->pontos_T.size(); i++)
     {
         this->pontos_T[i][0] += OBJ_MAX_X;
         this->pontos_T[i][1] = OBJ_MAX_Y - this->pontos_T[i][1];
         this->pontos_T[i][2] += OBJ_MAX_Z;
+        
+        menorZ = std::min(menorZ, this->pontos_T[i][2]);
     }
 
-    this->applyProjection();
+    this->applyProjection(menorZ);
+
+    // Traduz as coordenadas homogeneas e ajusta essas para tela
+    for (int i = 0; i < this->pontos_T.size(); i++)
+    {
+        this->pontos_T[i][0] = this->pontos_T[i][0] / this->pontos_T[i][3];
+        this->pontos_T[i][1] = this->pontos_T[i][1] / this->pontos_T[i][3];
+
+        this->pontos_T[i][0] = (WINDOW_WIDTH * (this->pontos_T[i][0] / (2.0 * OBJ_MAX_X)));
+        this->pontos_T[i][1] = (WINDOW_HEIGHT * (this->pontos_T[i][1] / (2.0 * OBJ_MAX_Y)));
+    }
 
     for (int i = 0; i < this->linhas.size(); i++)
-    {
-        Ponto p1 = this->pontos_T[this->linhas[i].first], p2 = this->pontos_T[this->linhas[i].second];
-        
-        p1.x = p1.x / p1.m;
-        p1.y = p1.y / p1.m;
-        p2.x = p2.x / p2.m;
-        p2.y = p2.y / p2.m;
-        
-        p1.x = (WINDOW_WIDTH * (p1.x / (2.0 * OBJ_MAX_X)));
-        p1.y = (WINDOW_HEIGHT * (p1.y / (2.0 * OBJ_MAX_Y)));
-        p2.x = (WINDOW_WIDTH * (p2.x / (2.0 * OBJ_MAX_X)));
-        p2.y = (WINDOW_HEIGHT * (p2.y / (2.0 * OBJ_MAX_Y)));
-
-        Utils::linhaDDA(renderer, p1, p2);
-    }
+        Utils::linhaDDA(renderer, this->pontos_T[this->linhas[i].first], this->pontos_T[this->linhas[i].second]);
 
     SDL_SetRenderDrawColor(renderer, before[0], before[1], before[2], before[3]);
 }
 
-void Objeto3D::applyProjection()
+void Objeto3D::applyProjection(double menorZ)
 {
     std::vector< std::vector<double> > projMat;
     if (this->projection == OBJ_PROJ_CAVALEIRA)
@@ -120,7 +120,35 @@ void Objeto3D::applyProjection()
         projMat = {
             {1, 0, 0, 0},
             {0, 1, 0, 0},
-            {0, 0, 0, -1.0/90.0},
+            {0, 0, 0, 1.0/90.0},
+            {0, 0, 0, 1}
+        };
+
+        // Empurra todos Z negativos para positivos
+        for (int i = 0; i < this->pontos_T.size(); i++)
+            this->pontos_T[i][2] += (-menorZ);
+    }
+
+    else if (this->projection == OBJ_PROJ_2PTFUGA)
+    {
+        projMat = {
+            {1, 0, 0, 1.0/5000.0},
+            {0, 1, 0, 0},
+            {0, 0, 0, 1.0/90.0},
+            {0, 0, 0, 1}
+        };
+
+        // Empurra todos Z negativos para positivos
+        for (int i = 0; i < this->pontos_T.size(); i++)
+            this->pontos_T[i][2] += (-menorZ);
+    }
+
+    else if (this->projection == OBJ_PROJ_ISOMETRICA)
+    {      
+        projMat = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 0, 0},
             {0, 0, 0, 1}
         };
     }
@@ -167,6 +195,26 @@ void Objeto3D::applyRotation()
         {0, 0, 0, 1}
     };
     this->pontos_T = Utils::Multiplica(this->pontos_T, RotY);
+
+    if (projection == OBJ_PROJ_ISOMETRICA)
+    {
+        int rry = 45, rrx = 30;
+        std::vector< std::vector<double> > RotY = { 
+            {cos(rad(rry)), 0, -sin(rad(rry)), 0},
+            {0, 1, 0, 0},
+            {sin(rad(rry)), 0, cos(rad(rry)), 0},
+            {0, 0, 0, 1}
+        };
+        this->pontos_T = Utils::Multiplica(this->pontos_T, RotY);
+
+        std::vector< std::vector<double> > RotX = { 
+            {1, 0, 0, 0},
+            {0, cos(rad(rrx)), sin(rad(rrx)), 0},
+            {0, -sin(rad(rrx)), cos(rad(rrx)), 0},
+            {0, 0, 0, 1}
+        };
+        this->pontos_T = Utils::Multiplica(this->pontos_T, RotX);
+    }
 }
 
 int Objeto3D::getPontosCount()

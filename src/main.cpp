@@ -28,15 +28,16 @@ char mode_name[][25] = {
     "Rotação entorno de X", "Rotação entorno de Y", "Rotação entorno de Z"
 };
 
-char proj_name[][20] = {
-    "Cavaleira", "Cabinet", "1 ponto de Fuga"
+char proj_name[][25] = {
+    "Cavaleira", "Cabinet", "Ponto de Fuga em Z", "Ponto de Fuga em Z e X", "Isométrica"
 };
 
+SDL_Texture* gInfoText = NULL;
 SDL_Texture* gProjInfoTex = NULL;
 SDL_Texture* gProjText = NULL;
 SDL_Texture* gModeInfoTex = NULL;
 SDL_Texture* gModeText = NULL;
-SDL_Rect gModeRect, gModeInfoRect, gProjInfoRect, gProjRect;
+SDL_Rect gModeRect, gModeInfoRect, gProjInfoRect, gProjRect, gInfoRect;
 
 bool bRunning = true;
 SDL_Window* gWindow = NULL;
@@ -135,9 +136,12 @@ void ProcessInput()
                 gObj->Translocation[3][0] += sinal * QTD_TRANSLACAO;
             else if (gMode == 1)
                 gObj->Translocation[3][1] += sinal * QTD_TRANSLACAO;
-            else if (gMode == 2)
+            else if (gMode == 2) {
                 gObj->Translocation[3][2] += sinal * QTD_TRANSLACAO;
-
+                if (gObj->projection == OBJ_PROJ_1PTFUGA)
+                    gObj->Translocation[3][2] = gObj->Translocation[3][2] < 51 ? 51 : gObj->Translocation[3][2];
+            }
+                
             else if (gMode == 3)
                 gObj->Scale[0][0] += sinal * QTD_ESCALA;
             else if (gMode == 4)
@@ -166,6 +170,8 @@ void ProcessInput()
                 else if (gObj->rz > 360)
                     gObj->rz = 0;
             }
+
+            cout << "Tz = " << gObj->Translocation[3][2] << endl;
             
         }
     }
@@ -187,6 +193,7 @@ void Draw()
 
     SDL_RenderCopy(gRender, gModeInfoTex, NULL, &gModeInfoRect);
     SDL_RenderCopy(gRender, gProjInfoTex, NULL, &gProjInfoRect);
+    SDL_RenderCopy(gRender, gInfoText, NULL, &gInfoRect);
     SDL_RenderCopy(gRender, gModeText, NULL, &gModeRect);
     SDL_RenderCopy(gRender, gProjText, NULL, &gProjRect);
 }
@@ -250,14 +257,19 @@ void setup()
     MenuEntry* projEntry = gMenu->AddNewEntry("Projeção", new Menu(gRender, gFont));
     projEntry->submenu->AddNewEntry("Cavaleira", [] { gObj->projection = OBJ_PROJ_CAVALEIRA; });
     projEntry->submenu->AddNewEntry("Cabinet", [] { gObj->projection = OBJ_PROJ_CABINET; });
-    projEntry->submenu->AddNewEntry("1 Ponto de Fuga", [] { gObj->projection = OBJ_PROJ_1PTFUGA; });
+    projEntry->submenu->AddNewEntry("Isométrica", [] { gObj->projection = OBJ_PROJ_ISOMETRICA; });
+    projEntry->submenu->AddNewEntry("Ponto de Fuga em Z", [] { gObj->projection = OBJ_PROJ_1PTFUGA; });
+    projEntry->submenu->AddNewEntry("Pontos de Fuga em Z e X", [] { gObj->projection = OBJ_PROJ_2PTFUGA; });    
 
     Utils::CreateText(gRender, gFont, "Transformação: ", {0x0, 0x0, 0x0}, &gModeInfoTex, &gModeInfoRect);
     Utils::CreateText(gRender, gFont, "Projeção: ", {0x0, 0x0, 0x0}, &gProjInfoTex, &gProjInfoRect);
+    Utils::CreateText(gRender, gFont, "Clique com BOTÃO DIREITO do mouse para opções", {0x0, 0x0, 0x0}, &gInfoText, &gInfoRect);
+    gInfoRect.x = 1;
+    gInfoRect.y = 1;    
     gModeInfoRect.x = 1;
-    gModeInfoRect.y = 1;
+    gModeInfoRect.y = 4 + gInfoRect.h;
     gProjInfoRect.x = 1;
-    gProjInfoRect.y = 4 + gModeInfoRect.h;
+    gProjInfoRect.y = 8 + gModeInfoRect.h + gInfoRect.h;
 }
 
 void loop()
@@ -280,6 +292,10 @@ void quit()
 {
     delete gObj;
     delete gMenu;
+
+    SDL_DestroyTexture(gInfoText);
+    SDL_DestroyTexture(gProjInfoTex);
+    SDL_DestroyTexture(gProjText);
     SDL_DestroyTexture(gModeInfoTex);
     SDL_DestroyTexture(gModeText);
     SDL_DestroyRenderer(gRender);

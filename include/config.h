@@ -19,6 +19,8 @@
 #define OBJ_PROJ_CAVALEIRA      0
 #define OBJ_PROJ_CABINET        1
 #define OBJ_PROJ_1PTFUGA        2
+#define OBJ_PROJ_2PTFUGA        3
+#define OBJ_PROJ_ISOMETRICA     4
 
 #define OBJ_CUBO                10001
 #define OBJ_PIRAMIDE            10002

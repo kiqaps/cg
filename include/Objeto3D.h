@@ -45,7 +45,7 @@ private:
     void applyTranslocation();
     void applyScale();
     void applyRotation();
-    void applyProjection();
+    void applyProjection(double menorZ);
     std::vector<Ponto> pontos_T;
     std::vector<Ponto> pontos;
     std::vector< std::pair<int, int> > linhas;
