@@ -25,7 +25,7 @@ int gMode = 0;
 char mode_name[][25] = {
     "Translação em X", "Translação em Y", "Translação em Z",
     "Escala em X", "Escala em Y", "Escala em Z",
-    "Rotação entorno de X", "Rotação entorno de Y", "Rotação entorno de Z"
+    "Rotação entorno de X", "Rotação entorno de Y", "Rotação entorno de Z", "Mudar FZ", "Mudar FX"
 };
 
 char proj_name[][25] = {
@@ -38,6 +38,8 @@ SDL_Texture* gProjText = NULL;
 SDL_Texture* gModeInfoTex = NULL;
 SDL_Texture* gModeText = NULL;
 SDL_Rect gModeRect, gModeInfoRect, gProjInfoRect, gProjRect, gInfoRect;
+
+vector<Ponto> divider;
 
 bool bRunning = true;
 SDL_Window* gWindow = NULL;
@@ -122,6 +124,11 @@ void ProcessInput()
                     else if (gObj->rz > 360)
                         gObj->rz = 10;
                 }
+
+                else if (gMode == 9&& (gObj->projection == OBJ_PROJ_2PTFUGA || gObj->projection == OBJ_PROJ_1PTFUGA))
+                    gObj->fz += sinal * 100;
+                else if (gMode == 10 && gObj->projection == OBJ_PROJ_2PTFUGA)
+                    gObj->fx += sinal * 100;
             }
         }
 
@@ -136,12 +143,9 @@ void ProcessInput()
                 gObj->Translocation[3][0] += sinal * QTD_TRANSLACAO;
             else if (gMode == 1)
                 gObj->Translocation[3][1] += sinal * QTD_TRANSLACAO;
-            else if (gMode == 2) {
+            else if (gMode == 2)
                 gObj->Translocation[3][2] += sinal * QTD_TRANSLACAO;
-                if (gObj->projection == OBJ_PROJ_1PTFUGA)
-                    gObj->Translocation[3][2] = gObj->Translocation[3][2] < 51 ? 51 : gObj->Translocation[3][2];
-            }
-                
+                            
             else if (gMode == 3)
                 gObj->Scale[0][0] += sinal * QTD_ESCALA;
             else if (gMode == 4)
@@ -170,9 +174,10 @@ void ProcessInput()
                 else if (gObj->rz > 360)
                     gObj->rz = 0;
             }
-
-            cout << "Tz = " << gObj->Translocation[3][2] << endl;
-            
+            else if (gMode == 9&& (gObj->projection == OBJ_PROJ_2PTFUGA || gObj->projection == OBJ_PROJ_1PTFUGA))
+                gObj->fz += sinal * 100;
+            else if (gMode == 10 && gObj->projection == OBJ_PROJ_2PTFUGA)
+                gObj->fx += sinal * 100;
         }
     }
 }
@@ -182,7 +187,7 @@ void Draw()
     SDL_SetRenderDrawColor(gRender, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(gRender);    
 
-    gObj->draw(gRender, 0xFF, 0x0, 0x0);
+    gObj->draw_vr(gRender, 0xFF, 0x0, 0x0);
 
     Utils::CreateText(gRender, gFont, mode_name[gMode], {0x0, 0x0, 0xFF}, &gModeText, &gModeRect);
     Utils::CreateText(gRender, gFont, proj_name[gObj->projection], {0x0, 0x0, 0xFF}, &gProjText, &gProjRect);
@@ -196,6 +201,9 @@ void Draw()
     SDL_RenderCopy(gRender, gInfoText, NULL, &gInfoRect);
     SDL_RenderCopy(gRender, gModeText, NULL, &gModeRect);
     SDL_RenderCopy(gRender, gProjText, NULL, &gProjRect);
+
+    SDL_SetRenderDrawColor(gRender, 0x0, 0x0, 0x0, 0xFF);
+    Utils::linhaDDA(gRender, divider[0], divider[1]);
 }
 
 void Update()
@@ -253,6 +261,8 @@ void setup()
     modoEntry->submenu->AddNewEntry("Rotação entorno de X", [] { gMode = 6; });
     modoEntry->submenu->AddNewEntry("Rotação entorno de Y", [] { gMode = 7; });
     modoEntry->submenu->AddNewEntry("Rotação entorno de Z", [] { gMode = 8; });
+    modoEntry->submenu->AddNewEntry("Mudar FZ", [] { gMode = 9; });
+    modoEntry->submenu->AddNewEntry("Mudar FX", [] { gMode = 10; });
 
     MenuEntry* projEntry = gMenu->AddNewEntry("Projeção", new Menu(gRender, gFont));
     projEntry->submenu->AddNewEntry("Cavaleira", [] { gObj->projection = OBJ_PROJ_CAVALEIRA; });
@@ -270,6 +280,11 @@ void setup()
     gModeInfoRect.y = 4 + gInfoRect.h;
     gProjInfoRect.x = 1;
     gProjInfoRect.y = 8 + gModeInfoRect.h + gInfoRect.h;
+
+    divider = {
+        {WINDOW_WIDTH / 2, 0},
+        {WINDOW_WIDTH / 2, WINDOW_HEIGHT}
+    };
 }
 
 void loop()

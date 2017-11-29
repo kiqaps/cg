@@ -50,7 +50,55 @@ Objeto3D* Objeto3D::create(int type)
 
 Objeto3D::Objeto3D()
 {
-    this->projection = OBJ_PROJ_CAVALEIRA;
+    this->projection = OBJ_PROJ_1PTFUGA;
+}
+
+void Objeto3D::draw_vr(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
+{
+    Uint8 before[4];
+    SDL_GetRenderDrawColor(renderer, &before[0], &before[1], &before[2], &before[3]);
+    SDL_SetRenderDrawColor(renderer, r, g, b, 0xFF);
+
+    this->resetTransformations();
+    this->applyScale();
+    this->applyRotation();
+    this->applyTranslocation();
+
+    // Corrige as coordenadas, define o centro no meio da tela
+    for (int i = 0; i < this->pontos_T.size(); i++)
+    {
+        this->pontos_T[i][0] += OBJ_MAX_X;
+        this->pontos_T[i][1] = OBJ_MAX_Y - this->pontos_T[i][1];
+        this->pontos_T[i][2] += OBJ_MAX_Z;
+    }
+
+    this->applyProjection();
+
+    // Traduz as coordenadas homogeneas e ajusta essas para tela
+    for (int i = 0; i < this->pontos_T.size(); i++)
+    {
+        this->pontos_T[i][0] = this->pontos_T[i][0] / this->pontos_T[i][3];
+        this->pontos_T[i][1] = this->pontos_T[i][1] / this->pontos_T[i][3];
+
+        this->pontos_T[i][0] = (WINDOW_WIDTH * (this->pontos_T[i][0] / (2.0 * OBJ_MAX_X)));
+        this->pontos_T[i][1] = (WINDOW_HEIGHT * (this->pontos_T[i][1] / (2.0 * OBJ_MAX_Y)));
+    }
+
+    for (int i = 0; i < this->linhas.size(); i++)
+    {
+        Ponto p1 = this->pontos_T[this->linhas[i].first],
+              p2 = this->pontos_T[this->linhas[i].second];
+
+        p1.x = p1.x - WINDOW_WIDTH / 4;
+        p2.x = p2.x - WINDOW_WIDTH / 4;
+        Utils::linhaDDA(renderer, p1, p2, 0);
+
+        p1.x += WINDOW_WIDTH / 2;
+        p2.x += WINDOW_WIDTH / 2;
+        Utils::linhaDDA(renderer, p1, p2, 1);
+    }
+
+    SDL_SetRenderDrawColor(renderer, before[0], before[1], before[2], before[3]);
 }
 
 void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
@@ -64,19 +112,15 @@ void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
     this->applyRotation();
     this->applyTranslocation();
 
-    double menorZ = 0;
-
     // Corrige as coordenadas, define o centro no meio da tela
     for (int i = 0; i < this->pontos_T.size(); i++)
     {
         this->pontos_T[i][0] += OBJ_MAX_X;
         this->pontos_T[i][1] = OBJ_MAX_Y - this->pontos_T[i][1];
         this->pontos_T[i][2] += OBJ_MAX_Z;
-        
-        menorZ = std::min(menorZ, this->pontos_T[i][2]);
     }
 
-    this->applyProjection(menorZ);
+    this->applyProjection();
 
     // Traduz as coordenadas homogeneas e ajusta essas para tela
     for (int i = 0; i < this->pontos_T.size(); i++)
@@ -94,7 +138,7 @@ void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
     SDL_SetRenderDrawColor(renderer, before[0], before[1], before[2], before[3]);
 }
 
-void Objeto3D::applyProjection(double menorZ)
+void Objeto3D::applyProjection()
 {
     std::vector< std::vector<double> > projMat;
     if (this->projection == OBJ_PROJ_CAVALEIRA)
@@ -120,27 +164,27 @@ void Objeto3D::applyProjection(double menorZ)
         projMat = {
             {1, 0, 0, 0},
             {0, 1, 0, 0},
-            {0, 0, 0, 1.0/90.0},
+            {0, 0, 0, -1.0/this->fz},
             {0, 0, 0, 1}
         };
 
         // Empurra todos Z negativos para positivos
-        for (int i = 0; i < this->pontos_T.size(); i++)
-            this->pontos_T[i][2] += (-menorZ);
+        //for (int i = 0; i < this->pontos_T.size(); i++)
+        //    this->pontos_T[i][2] += (-menorZ);
     }
 
     else if (this->projection == OBJ_PROJ_2PTFUGA)
     {
         projMat = {
-            {1, 0, 0, 1.0/5000.0},
+            {1, 0, 0, -1.0/this->fx},
             {0, 1, 0, 0},
-            {0, 0, 0, 1.0/90.0},
+            {0, 0, 0, -1.0/this->fz},
             {0, 0, 0, 1}
         };
 
         // Empurra todos Z negativos para positivos
-        for (int i = 0; i < this->pontos_T.size(); i++)
-            this->pontos_T[i][2] += (-menorZ);
+        //for (int i = 0; i < this->pontos_T.size(); i++)
+        //    this->pontos_T[i][2] += (-menorZ);
     }
 
     else if (this->projection == OBJ_PROJ_ISOMETRICA)
