@@ -34,7 +34,7 @@ public:
     void addNewLine(Ponto p1, Ponto p2);
     void resetTransformations();
 
-    void draw_vr(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b);
+    void draw_vr(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, std::vector< std::vector<double> >& zbuf);
     void draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b);
 
     Ponto& operator[] (int idx);
@@ -48,7 +48,7 @@ private:
     void applyTranslocation();
     void applyScale();
     void applyRotation();
-    void applyProjection();
+    void applyProjection(bool vr);
     std::vector<Ponto> pontos_T;
     std::vector<Ponto> pontos;
     std::vector< std::pair<int, int> > linhas;

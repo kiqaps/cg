@@ -11,9 +11,9 @@ Objeto3D* Objeto3D::create(int type)
     obj->Translocation[3][0] = 1;
     obj->Translocation[3][1] = 1;
     obj->Translocation[3][2] = 1;
-    obj->Scale[0][0] = 50;
-    obj->Scale[1][1] = 50;
-    obj->Scale[2][2] = 50;
+    obj->Scale[0][0] = 100;
+    obj->Scale[1][1] = 100;
+    obj->Scale[2][2] = 100;
     obj->rx = 0;
     obj->ry = 0;
     obj->rz = 0;
@@ -53,7 +53,7 @@ Objeto3D::Objeto3D()
     this->projection = OBJ_PROJ_1PTFUGA;
 }
 
-void Objeto3D::draw_vr(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
+void Objeto3D::draw_vr(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b, std::vector< std::vector<double> >& zbuf)
 {
     Uint8 before[4];
     SDL_GetRenderDrawColor(renderer, &before[0], &before[1], &before[2], &before[3]);
@@ -72,7 +72,7 @@ void Objeto3D::draw_vr(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
         this->pontos_T[i][2] += OBJ_MAX_Z;
     }
 
-    this->applyProjection();
+    this->applyProjection(true);
 
     // Traduz as coordenadas homogeneas e ajusta essas para tela
     for (int i = 0; i < this->pontos_T.size(); i++)
@@ -91,13 +91,14 @@ void Objeto3D::draw_vr(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
 
         p1.x = p1.x - WINDOW_WIDTH / 4;
         p2.x = p2.x - WINDOW_WIDTH / 4;
-        Utils::linhaDDA(renderer, p1, p2, 0);
+        Utils::linhaDDA(renderer, p1, p2, 0, zbuf);
 
         p1.x += WINDOW_WIDTH / 2;
         p2.x += WINDOW_WIDTH / 2;
-        Utils::linhaDDA(renderer, p1, p2, 1);
+        Utils::linhaDDA(renderer, p1, p2, 1, zbuf);
     }
-
+    SDL_SetRenderDrawColor(renderer, 0x0, 0x0, 0x0, 0xFF);
+    Utils::linhaDDA(renderer, {WINDOW_WIDTH / 2, 0}, {WINDOW_WIDTH / 2, WINDOW_HEIGHT});
     SDL_SetRenderDrawColor(renderer, before[0], before[1], before[2], before[3]);
 }
 
@@ -120,7 +121,7 @@ void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
         this->pontos_T[i][2] += OBJ_MAX_Z;
     }
 
-    this->applyProjection();
+    this->applyProjection(false);
 
     // Traduz as coordenadas homogeneas e ajusta essas para tela
     for (int i = 0; i < this->pontos_T.size(); i++)
@@ -138,7 +139,7 @@ void Objeto3D::draw(SDL_Renderer* renderer, Uint8 r, Uint8 g, Uint8 b)
     SDL_SetRenderDrawColor(renderer, before[0], before[1], before[2], before[3]);
 }
 
-void Objeto3D::applyProjection()
+void Objeto3D::applyProjection(bool vr)
 {
     std::vector< std::vector<double> > projMat;
     if (this->projection == OBJ_PROJ_CAVALEIRA)
@@ -161,12 +162,39 @@ void Objeto3D::applyProjection()
     }
     else if (this->projection == OBJ_PROJ_1PTFUGA)
     {
+        double fx = WINDOW_WIDTH * 1.25, fy = WINDOW_HEIGHT * 1.25;
         projMat = {
             {1, 0, 0, 0},
             {0, 1, 0, 0},
-            {0, 0, 0, -1.0/this->fz},
+            {0, 0, 1, -1.0/this->fz},
             {0, 0, 0, 1}
         };
+
+        std::vector< std::vector<double> > mat = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0},
+            {-fx, -fy, 0, 1},
+        };
+
+        projMat = Utils::Multiplica(mat, projMat);
+
+        // for (int i = 0; i < 4; i++)
+        // {
+        //     for (int j = 0; j < 4; j++)
+        //         std::cout << " " << projMat[i][j];
+        //     std::cout << std::endl;
+        // }
+
+
+        mat = {
+            {1, 0, 0, 0},
+            {0, 1, 0, 0},
+            {0, 0, 1, 0},
+            {fx, fy, 0, 1},
+        };
+
+        projMat = Utils::Multiplica(projMat, mat);
 
         // Empurra todos Z negativos para positivos
         //for (int i = 0; i < this->pontos_T.size(); i++)
@@ -174,7 +202,7 @@ void Objeto3D::applyProjection()
     }
 
     else if (this->projection == OBJ_PROJ_2PTFUGA)
-    {
+    {        
         projMat = {
             {1, 0, 0, -1.0/this->fx},
             {0, 1, 0, 0},

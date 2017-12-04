@@ -21,6 +21,8 @@ void quit();
 
 void CreateText(SDL_Renderer* render, TTF_Font* font, const char* text, SDL_Color color, SDL_Texture** texture, SDL_Rect* rect);
 
+vector< vector<double> > zbuf = vector< vector<double> >(800, vector<double>(600, -1000000.0));
+
 int gMode = 0;
 char mode_name[][25] = {
     "Translação em X", "Translação em Y", "Translação em Z",
@@ -38,8 +40,6 @@ SDL_Texture* gProjText = NULL;
 SDL_Texture* gModeInfoTex = NULL;
 SDL_Texture* gModeText = NULL;
 SDL_Rect gModeRect, gModeInfoRect, gProjInfoRect, gProjRect, gInfoRect;
-
-vector<Ponto> divider;
 
 bool bRunning = true;
 SDL_Window* gWindow = NULL;
@@ -187,7 +187,7 @@ void Draw()
     SDL_SetRenderDrawColor(gRender, 0xFF, 0xFF, 0xFF, 0xFF);
     SDL_RenderClear(gRender);    
 
-    gObj->draw_vr(gRender, 0xFF, 0x0, 0x0);
+    gObj->draw_vr(gRender, 0xFF, 0x0, 0x0, zbuf);
 
     Utils::CreateText(gRender, gFont, mode_name[gMode], {0x0, 0x0, 0xFF}, &gModeText, &gModeRect);
     Utils::CreateText(gRender, gFont, proj_name[gObj->projection], {0x0, 0x0, 0xFF}, &gProjText, &gProjRect);
@@ -203,7 +203,6 @@ void Draw()
     SDL_RenderCopy(gRender, gProjText, NULL, &gProjRect);
 
     SDL_SetRenderDrawColor(gRender, 0x0, 0x0, 0x0, 0xFF);
-    Utils::linhaDDA(gRender, divider[0], divider[1]);
 }
 
 void Update()
@@ -280,11 +279,6 @@ void setup()
     gModeInfoRect.y = 4 + gInfoRect.h;
     gProjInfoRect.x = 1;
     gProjInfoRect.y = 8 + gModeInfoRect.h + gInfoRect.h;
-
-    divider = {
-        {WINDOW_WIDTH / 2, 0},
-        {WINDOW_WIDTH / 2, WINDOW_HEIGHT}
-    };
 }
 
 void loop()

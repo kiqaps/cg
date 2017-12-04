@@ -1,3 +1,6 @@
+#include <vector>
+
+using namespace std;
 
 #ifndef _CONFIG_H
 #define _CONFIG_H
